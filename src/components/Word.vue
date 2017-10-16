@@ -1,21 +1,43 @@
 <template>
   <article class="ui segment">
-    <span>{{word.front}}</span>
-    <span>{{word.back}}</span>
+    <span>{{front}}</span>
+    <span>{{back}}</span>
+    <div v-if="forvoPronunciation">
+      Forvo pronunciation
+      <audio controls>
+        <source :src="forvoPronunciation" type="audio/mpeg">
+      </audio>
+    </div>
   </article>
 </template>
 
 <script>
-import { makeURLCompatible } from '@/utils';
+import { makeURLCompatible } from '../utils';
 
 export default {
   name: 'Word',
-  props: ['id'],
-  computed: {
-    word() {
+  data() {
+    return {
+      front: '',
+      back: '',
+      forvoPronunciation: '',
+    };
+  },
+  created() {
+    this.fetchData();
+  },
+  watch: {
+    $route: 'fetchData',
+  },
+  methods: {
+    async fetchData() {
       const { deck } = this.$store.state;
       const { id } = this.$route.params;
-      return deck.find(word => makeURLCompatible(word.front) === id);
+      const activeWord = deck.find(word => makeURLCompatible(word.front) === id);
+      this.front = activeWord.front;
+      this.back = activeWord.back;
+      const { body: { soundFile } } = await this.$http.get(`forvo/standard-pronunciation/de/${makeURLCompatible(activeWord.front)}`);
+      this.forvoPronunciation = soundFile;
     },
   },
 };
