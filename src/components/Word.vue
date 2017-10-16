@@ -1,13 +1,25 @@
 <template>
   <article class="ui segment">
-    <span>{{front}}</span>
-    <span>{{back}}</span>
-    <div v-if="forvoPronunciation">
-      Forvo pronunciation
-      <audio controls>
-        <source :src="forvoPronunciation" type="audio/mpeg">
-      </audio>
-    </div>
+    <form class="ui form">
+      <div class="field">
+        <div class="two fields">
+          <div class="field">
+            <label>Front</label>
+            <input type="text" v-model="front" readonly>
+          </div>
+          <div class="field">
+            <label>Back</label>
+            <input type="text" v-model="back" >
+          </div>
+        </div>
+      </div>
+      <div class="field" v-if="forvoPronunciation">
+        <label>Forvo pronunciation</label>
+        <audio controls>
+          <source :src="forvoPronunciation" type="audio/mpeg">
+        </audio>
+      </div>
+    </form>
   </article>
 </template>
 
