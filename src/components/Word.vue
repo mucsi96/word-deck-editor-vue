@@ -15,7 +15,8 @@
       </div>
       <div class="field">
         <label>Forvo pronunciation</label>
-        <audio ref="forvoPronunciation" controls>
+        <audio :key="word.forvoPronunciation" controls>
+          <source :src="word.forvoPronunciation" type="audio/mpeg">
         </audio>
       </div>
     </form>
@@ -48,8 +49,7 @@ export default {
         return;
       }
       const { body: { soundFile } } = await this.$http.get(`forvo/standard-pronunciation/de/${makeURLCompatible(this.word.front)}`);
-      this.$refs.forvoPronunciation.src = soundFile;
-      this.$refs.forvoPronunciation.load();
+      this.word.forvoPronunciation = soundFile;
     },
   },
 };
