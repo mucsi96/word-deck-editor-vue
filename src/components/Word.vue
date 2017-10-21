@@ -1,6 +1,6 @@
 <template>
   <article class="ui segment">
-    <form class="ui form">
+    <form class="ui form" :class="{ loading }">
       <div class="field">
         <div class="two fields">
           <div class="field">
@@ -31,6 +31,7 @@ export default {
   data() {
     return {
       word: {},
+      loading: false,
     };
   },
   created() {
@@ -48,8 +49,10 @@ export default {
       if (!match) {
         return;
       }
+      this.loading = true;
       const { body: { soundFile } } = await this.$http.get(`forvo/standard-pronunciation/de/${makeURLCompatible(this.word.front)}`);
       this.word.forvoPronunciation = soundFile;
+      this.loading = false;
     },
   },
 };

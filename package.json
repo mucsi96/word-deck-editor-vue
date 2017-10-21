@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "body-parser": "^1.18.2",
+    "chromedriver": "^2.33.1",
     "dotenv": "^4.0.0",
     "forvo": "^0.2.4",
     "semantic-ui-css": "^2.2.12",
