@@ -7,5 +7,6 @@ const router = Router();
 const wrap = fn => (...args) => fn(...args).catch(args[2]);
 
 router.get('/forvo/:lang/:word', wrap(controllers.forvo.get));
+router.get('/linguee/:from/:to/:word', wrap(controllers.linguee.get));
 
 export default router;

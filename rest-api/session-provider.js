@@ -5,17 +5,18 @@ const sessionOption = {
   desiredCapabilities: {
     browserName: 'chrome',
     javascriptEnabled: true,
-    chromeOptions: {
-      args: ['incognito', 'headless', 'no-sandbox', 'disable-gpu'],
-    },
+    // chromeOptions: {
+    //   args: ['incognito', 'headless', 'no-sandbox', 'disable-gpu'],
+    // },
   },
 };
 
 let forvoSession;
+let lingueeSession;
 
 export async function start(port) {
-  if (forvoSession) return;
   forvoSession = await newSession(`http://localhost:${port}`, sessionOption);
+  lingueeSession = await newSession(`http://localhost:${port}`, sessionOption);
 }
 
 export async function stop() {
@@ -24,8 +25,17 @@ export async function stop() {
   } catch (err) {
     logger.info('session already deleted');
   }
+  try {
+    await lingueeSession.delete();
+  } catch (err) {
+    logger.info('session already deleted');
+  }
 }
 
 export const forvo = new Proxy({}, {
   get: (target, name) => forvoSession[name],
+});
+
+export const linguee = new Proxy({}, {
+  get: (target, name) => lingueeSession[name],
 });

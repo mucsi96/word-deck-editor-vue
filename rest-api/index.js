@@ -19,10 +19,11 @@ const stop = async () => {
   await stopServer();
 };
 
-process.on('SIGINT', () => stop().catch(err => logger.error(err)));
-process.on('SIGTERM', () => stop().catch(err => logger.error(err)));
+process.on('SIGINT', () => stop().catch(err => logger.error(err)).then(() => process.exit()));
+process.on('SIGTERM', () => stop().catch(err => logger.error(err)).then(() => process.exit()));
+process.on('SIGHUP', () => stop().catch(err => logger.error(err)).then(() => process.exit()));
 
 start().catch((err) => {
   logger.error(err);
-  return stop();
+  return stop().catch(err2 => logger.error(err2)).then(() => process.exit());
 });

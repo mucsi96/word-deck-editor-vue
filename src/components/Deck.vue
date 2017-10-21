@@ -19,8 +19,6 @@
 </template>
 
 <script>
-import { makeURLCompatible } from '@/utils';
-
 export default {
   name: 'Deck',
   computed: {
@@ -30,7 +28,7 @@ export default {
   },
   methods: {
     getWordId(word) {
-      return makeURLCompatible(word.front);
+      return encodeURIComponent(word.front);
     },
   },
 };

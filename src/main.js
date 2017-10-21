@@ -27,7 +27,7 @@ Vue.http.interceptors.push((request, next) => {
       next(request.respondWith(cachedValue, {
         status: 200,
       }));
-    }).catch(err => console.log(err.stack));
+    });
   }
 });
 
