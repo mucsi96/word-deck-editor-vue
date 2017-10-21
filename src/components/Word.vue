@@ -1,6 +1,7 @@
 <template>
   <article class="ui segment">
-    <form class="ui form" :class="{ loading }">
+    <h4 class="ui header">Word</h4>
+    <form class="ui form">
       <div class="field">
         <div class="two fields">
           <div class="field">
@@ -13,10 +14,13 @@
           </div>
         </div>
       </div>
-      <div class="field">
-        <label>Forvo pronunciation</label>
-        <audio :key="word.forvoPronunciation" controls>
-          <source :src="word.forvoPronunciation" type="audio/mpeg">
+    </form>
+    <h4 class="ui header">Forvo pronunciations</h4>
+    <form class="ui form" :class="{ loading: forvo.loading }">
+      <div v-for="pronunciation in forvo.pronunciations" :key="pronunciation.word" class="field">
+        <label>{{pronunciation.word}}</label>
+        <audio controls>
+          <source :src="pronunciation.sound" type="audio/mpeg">
         </audio>
       </div>
     </form>
@@ -31,7 +35,10 @@ export default {
   data() {
     return {
       word: {},
-      loading: false,
+      forvo: {
+        loading: false,
+        pronunciations: [],
+      },
     };
   },
   created() {
@@ -49,10 +56,16 @@ export default {
       if (!match) {
         return;
       }
-      this.loading = true;
-      const { body: { soundFile } } = await this.$http.get(`forvo/standard-pronunciation/de/${makeURLCompatible(this.word.front)}`);
-      this.word.forvoPronunciation = soundFile;
-      this.loading = false;
+      await this.fetchForvo();
+    },
+    async fetchForvo() {
+      try {
+        this.forvo.loading = true;
+        const response = await this.$http.get(`forvo/de/${makeURLCompatible(this.word.front)}`);
+        this.forvo.pronunciations = response.body;
+      } finally {
+        this.forvo.loading = false;
+      }
     },
   },
 };

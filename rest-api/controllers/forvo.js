@@ -1,16 +1,12 @@
-import forvoApi from 'forvo';
-import { getEnvProp } from '../env';
+import fs from 'fs';
+import path from 'path';
+import { forvo as session } from '../session-provider';
 
-const forvo = forvoApi({ key: getEnvProp('FORVO_KEY') });
+const script = fs.readFileSync(path.resolve(__dirname, 'script.js'), 'utf8');
 
-export async function getStandardPronunciation({ params: { word, lang } }, res) {
-  const wordPronunciations = await forvo.standardPronunciation({ word, language: lang });
-  if (!wordPronunciations.items.length) {
-    res.send({});
-    return;
-  }
-
-  res.send({
-    soundFile: wordPronunciations.items[0].pathmp3,
-  });
+export async function get({ params: { word, lang } }, res) {
+  const url = `https://forvo.com/search/${encodeURIComponent(word)}/${encodeURIComponent(lang)}`;
+  await session.go(url);
+  const result = await session.executeScript(script);
+  res.send(result);
 }
