@@ -36,6 +36,30 @@
           <source :src="pronunciation.sound" type="audio/mpeg">
         </audio>
       </div>
+      <div class="field">
+        <label>Tags</label>
+        <input type="text" v-model="linguee.tags" readonly>
+      </div>
+    </form>
+    <h4 class="ui header">Wiktionary pronunciations</h4>
+    <form class="ui form" :class="{ loading: wiktionary.loading }" :key="word.front">
+      <div class="field">
+        <label>Word</label>
+        <input type="text" v-model="wiktionary.word" readonly>
+      </div>
+      <div class="field">
+        <label>IPA</label>
+        <input type="text" v-model="wiktionary.ipa" readonly>
+      </div>
+      <div v-for="pronunciation in wiktionary.pronunciations" :key="pronunciation.word" class="field">
+        <label>{{pronunciation.word}}</label>
+        <audio controls>
+          <source :src="pronunciation.sound">
+        </audio>
+      </div>
+      <div v-for="picture in wiktionary.pictures" :key="picture.file" class="field">
+        <img class="ui medium bordered image" :src="picture.file" />
+      </div>
     </form>
   </article>
 </template>
@@ -53,6 +77,11 @@ export default {
       linguee: {
         loading: false,
         pronunciations: [],
+      },
+      wiktionary: {
+        loading: false,
+        pronunciations: [],
+        pictures: [],
       },
     };
   },
@@ -73,6 +102,7 @@ export default {
       }
       this.fetchForvo();
       this.fetchLinguee();
+      this.fetchWiktionary();
     },
     async fetchForvo() {
       try {
@@ -93,8 +123,21 @@ export default {
 
         this.linguee.pronunciations = response.body.pronunciations;
         this.linguee.translation = response.body.translation;
+        this.linguee.tags = response.body.tags.join(', ');
       } finally {
         this.linguee.loading = false;
+      }
+    },
+    async fetchWiktionary() {
+      try {
+        this.wiktionary.loading = true;
+        const response = await this.$http.get(`wiktionary/de/${encodeURIComponent(this.word.front)}`);
+
+        if (!response.body) return;
+
+        Object.assign(this.wiktionary, response.body);
+      } finally {
+        this.wiktionary.loading = false;
       }
     },
   },

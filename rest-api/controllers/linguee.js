@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import ISO6391 from 'iso-639-1';
-import { linguee as session } from '../session-provider';
+import { create as createSession, remove as removeSession } from '../session';
 import { getJSONCache, cacheMedia, cacheJSON } from '../cache';
 import logger from '../logger';
 
@@ -18,17 +18,23 @@ export async function get({ params: { word, from, to } }, res) {
     return;
   }
   logger.info(`${cacheName} not found in cache. Fetching...`);
-  const url = `https://www.linguee.com/${ISO6391.getName(from)}-${ISO6391.getName(to)}/search?source=${ISO6391.getName(from)}&query=${encodeURIComponent(word)}`;
-  await session.go(url);
-  const result = await session.executeScript(script);
-  // eslint-disable-next-line no-restricted-syntax
-  for (const pronunciation of result.pronunciations) {
-    const target = `${path.dirname(cacheName)}/${pronunciation.word.replace(' ', '-')}.mp3`;
-    // eslint-disable-next-line no-await-in-loop
-    await cacheMedia(pronunciation.sound, target);
-    pronunciation.sound = `/media/${target}`;
+  const session = await createSession();
+  try {
+    const url = `https://www.linguee.com/${ISO6391.getName(from)}-${ISO6391.getName(to)}/search?source=${ISO6391.getName(from)}&query=${encodeURIComponent(word)}`;
+    await session.go(url);
+    const result = await session.executeScript(script);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const pronunciation of result.pronunciations) {
+      const target = `${path.dirname(cacheName)}/${pronunciation.word.replace(' ', '-')}.mp3`;
+      // eslint-disable-next-line no-await-in-loop
+      await cacheMedia(pronunciation.sound, target);
+      pronunciation.sound = `/media/${target}`;
+    }
+    await cacheJSON(result, cacheName);
+    logger.info(`${cacheName} cached`);
+    res.send(result);
+  } catch (err) {
+    await removeSession(session);
+    throw err;
   }
-  await cacheJSON(result, cacheName);
-  logger.info(`${cacheName} cached`);
-  res.send(result);
 }

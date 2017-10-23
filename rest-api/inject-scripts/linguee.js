@@ -14,7 +14,14 @@ const getPronunciations = () => {
   }];
 };
 
+const getTags = () => {
+  const tagsNode = document.querySelector('.exact .tag_lemma .tag_wordtype');
+  if (!tagsNode) return [];
+  return tagsNode.textContent.split(', ');
+};
+
 return {
   translation: getTranslation(),
   pronunciations: getPronunciations(),
+  tags: getTags(),
 };

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import ISO6391 from 'iso-639-1';
-import { forvo as session } from '../session-provider';
+import { create as createSession, remove as removeSession } from '../session';
 import { getJSONCache, cacheMedia, cacheJSON } from '../cache';
 import logger from '../logger';
 
@@ -25,17 +25,24 @@ export async function get({ params: { word, lang } }, res) {
     return;
   }
   logger.info(`${cacheName} not found in cache. Fetching...`);
-  const url = `https://forvo.com/search/${makeURLCompatible(word)}/${lang}`;
-  await session.go(url);
-  const pronunciations = await session.executeScript(script);
-  // eslint-disable-next-line no-restricted-syntax
-  for (const pronunciation of pronunciations) {
-    const target = `${path.dirname(cacheName)}/${pronunciation.word.replace(' ', '-')}.mp3`;
-    // eslint-disable-next-line no-await-in-loop
-    await cacheMedia(pronunciation.sound, target);
-    pronunciation.sound = `/media/${target}`;
+  const session = await createSession();
+  try {
+    const url = `https://forvo.com/search/${makeURLCompatible(word)}/${lang}`;
+    await session.go(url);
+    const pronunciations = await session.executeScript(script);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const pronunciation of pronunciations) {
+      const target = `${path.dirname(cacheName)}/${pronunciation.word.replace(' ', '-')}.mp3`;
+      // eslint-disable-next-line no-await-in-loop
+      await cacheMedia(pronunciation.sound, target);
+      pronunciation.sound = `/media/${target}`;
+    }
+    await cacheJSON(pronunciations, cacheName);
+    logger.info(`${cacheName} cached`);
+    res.send(pronunciations);
+    await removeSession(session);
+  } catch (err) {
+    await removeSession(session);
+    throw err;
   }
-  await cacheJSON(pronunciations, cacheName);
-  logger.info(`${cacheName} cached`);
-  res.send(pronunciations);
 }
