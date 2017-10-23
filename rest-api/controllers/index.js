@@ -1,9 +1,5 @@
-import * as forvo from './forvo';
-import * as linguee from './linguee';
-import * as wiktionary from './wiktionary';
+import * as meta from './meta';
 
 export default {
-  forvo,
-  linguee,
-  wiktionary,
+  meta,
 };

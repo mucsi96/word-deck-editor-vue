@@ -1,8 +1,8 @@
 <template>
   <article class="ui segment">
     <h4 class="ui header">Word</h4>
-    <form class="ui form" :key="word.front">
-      <div class="field">
+    <form class="ui form" :key="word.front" :class="{ loading }">
+      <div class="field" v-if="word.back">
         <div class="two fields">
           <div class="field">
             <label>Front</label>
@@ -14,50 +14,25 @@
           </div>
         </div>
       </div>
-    </form>
-    <h4 class="ui header">Forvo pronunciations</h4>
-    <form class="ui form" :class="{ loading: forvo.loading }" :key="word.front">
-      <div v-for="pronunciation in forvo.pronunciations" :key="pronunciation.word" class="field">
-        <label>{{pronunciation.word}}</label>
-        <audio controls>
-          <source :src="pronunciation.sound" type="audio/mpeg">
-        </audio>
+      <div class="field" v-if="meta.wordClass">
+        <label>Class</label>
+        <input type="text" v-model="meta.wordClass" readonly>
       </div>
-    </form>
-    <h4 class="ui header">Linguee pronunciations</h4>
-    <form class="ui form" :class="{ loading: linguee.loading }" :key="word.front">
-      <div class="field">
-        <label>English</label>
-        <input type="text" v-model="linguee.translation" readonly>
+      <div class="field" v-if="meta.gender">
+        <label>Gender</label>
+        <input type="text" v-model="meta.gender" readonly>
       </div>
-      <div v-for="pronunciation in linguee.pronunciations" :key="pronunciation.word" class="field">
-        <label>{{pronunciation.word}}</label>
-        <audio controls>
-          <source :src="pronunciation.sound" type="audio/mpeg">
-        </audio>
-      </div>
-      <div class="field">
-        <label>Tags</label>
-        <input type="text" v-model="linguee.tags" readonly>
-      </div>
-    </form>
-    <h4 class="ui header">Wiktionary pronunciations</h4>
-    <form class="ui form" :class="{ loading: wiktionary.loading }" :key="word.front">
-      <div class="field">
-        <label>Word</label>
-        <input type="text" v-model="wiktionary.word" readonly>
-      </div>
-      <div class="field">
+      <div class="field" v-if="meta.ipa">
         <label>IPA</label>
-        <input type="text" v-model="wiktionary.ipa" readonly>
+        <input type="text" v-model="meta.ipa" readonly>
       </div>
-      <div v-for="pronunciation in wiktionary.pronunciations" :key="pronunciation.word" class="field">
+      <div v-if="meta.pronunciations" v-for="pronunciation in meta.pronunciations" :key="pronunciation.word" class="field">
         <label>{{pronunciation.word}}</label>
         <audio controls>
-          <source :src="pronunciation.sound">
+          <source :src="pronunciation.sound" type="audio/mpeg">
         </audio>
       </div>
-      <div v-for="picture in wiktionary.pictures" :key="picture.file" class="field">
+      <div v-if="meta.pictures" v-for="picture in meta.pictures" :key="picture.file" class="field">
         <img class="ui medium bordered image" :src="picture.file" />
       </div>
     </form>
@@ -70,19 +45,8 @@ export default {
   data() {
     return {
       word: {},
-      forvo: {
-        loading: false,
-        pronunciations: [],
-      },
-      linguee: {
-        loading: false,
-        pronunciations: [],
-      },
-      wiktionary: {
-        loading: false,
-        pronunciations: [],
-        pictures: [],
-      },
+      meta: {},
+      loading: false,
     };
   },
   created() {
@@ -100,44 +64,14 @@ export default {
       if (!match) {
         return;
       }
-      this.fetchForvo();
-      this.fetchLinguee();
-      this.fetchWiktionary();
-    },
-    async fetchForvo() {
       try {
-        this.forvo.loading = true;
-        const response = await this.$http.get(`forvo/de/${encodeURIComponent(this.word.front)}`);
+        this.loading = true;
+        this.meta = {};
+        const response = await this.$http.get(`meta/de/${encodeURIComponent(this.word.front)}`);
         if (!response.body) return;
-        this.forvo.pronunciations = response.body;
+        Object.assign(this.meta, response.body);
       } finally {
-        this.forvo.loading = false;
-      }
-    },
-    async fetchLinguee() {
-      try {
-        this.linguee.loading = true;
-        const response = await this.$http.get(`linguee/de/en/${encodeURIComponent(this.word.front)}`);
-
-        if (!response.body) return;
-
-        this.linguee.pronunciations = response.body.pronunciations;
-        this.linguee.translation = response.body.translation;
-        this.linguee.tags = response.body.tags.join(', ');
-      } finally {
-        this.linguee.loading = false;
-      }
-    },
-    async fetchWiktionary() {
-      try {
-        this.wiktionary.loading = true;
-        const response = await this.$http.get(`wiktionary/de/${encodeURIComponent(this.word.front)}`);
-
-        if (!response.body) return;
-
-        Object.assign(this.wiktionary, response.body);
-      } finally {
-        this.wiktionary.loading = false;
+        this.loading = false;
       }
     },
   },

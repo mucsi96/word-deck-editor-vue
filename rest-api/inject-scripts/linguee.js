@@ -14,14 +14,25 @@ const getPronunciations = () => {
   }];
 };
 
-const getTags = () => {
+const getWordClass = () => {
   const tagsNode = document.querySelector('.exact .tag_lemma .tag_wordtype');
-  if (!tagsNode) return [];
-  return tagsNode.textContent.split(', ');
+  if (!tagsNode) return undefined;
+  const match = tagsNode.textContent.match(/noun|verb|adjective|adverb|pronoun|preposition|conjunction|article|interjection/);
+  if (!match) return undefined;
+  return match[0];
+};
+
+const getGender = () => {
+  const tagsNode = document.querySelector('.exact .tag_lemma .tag_wordtype');
+  if (!tagsNode) return undefined;
+  const match = tagsNode.textContent.match(/masculine|feminine|neuter/);
+  if (!match) return undefined;
+  return match[0];
 };
 
 return {
   translation: getTranslation(),
   pronunciations: getPronunciations(),
-  tags: getTags(),
+  wordClass: getWordClass(),
+  gender: getGender(),
 };
