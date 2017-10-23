@@ -28,10 +28,12 @@ export async function get({ params: { word, lang } }, res) {
   const url = `https://forvo.com/search/${makeURLCompatible(word)}/${lang}`;
   await session.go(url);
   const pronunciations = await session.executeScript(script);
+  // eslint-disable-next-line no-restricted-syntax
   for (const pronunciation of pronunciations) {
     const target = `${path.dirname(cacheName)}/${pronunciation.word.replace(' ', '-')}.mp3`;
+    // eslint-disable-next-line no-await-in-loop
     await cacheMedia(pronunciation.sound, target);
-    pronunciation.sound = `/api/media/${target}`;
+    pronunciation.sound = `/media/${target}`;
   }
   await cacheJSON(pronunciations, cacheName);
   logger.info(`${cacheName} cached`);

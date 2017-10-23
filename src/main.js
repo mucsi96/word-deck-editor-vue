@@ -14,23 +14,6 @@ localforage.config({
 Vue.config.productionTip = false;
 Vue.use(VueResource);
 Vue.http.options.root = '/api';
-Vue.http.interceptors.push((request, next) => {
-  if (request.method.toLowerCase() === 'get') {
-    localforage.getItem(request.url).then((cachedValue) => {
-      if (!cachedValue) {
-        next((response) => {
-          if (response && response.status === 200) {
-            localforage.setItem(request.url, response.body);
-          }
-        });
-      }
-      next(request.respondWith(cachedValue, {
-        status: 200,
-      }));
-    });
-  }
-});
-
 
 /* eslint-disable no-new */
 new Vue({

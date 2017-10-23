@@ -1,3 +1,4 @@
+import path from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
 import routes from './routes';
@@ -8,6 +9,7 @@ let httpServer;
 
 app.use(bodyParser.json());
 app.use(routes);
+app.use('/media', express.static(path.join(__dirname, '../cache')));
 
 export function start(port) {
   return new Promise((resolve) => {
