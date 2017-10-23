@@ -26,14 +26,20 @@
         <label>IPA</label>
         <input type="text" v-model="meta.ipa" readonly>
       </div>
-      <div v-if="meta.pronunciations" v-for="pronunciation in meta.pronunciations" :key="pronunciation.word" class="field">
-        <label>{{pronunciation.word}}</label>
-        <audio controls>
-          <source :src="pronunciation.sound" type="audio/mpeg">
-        </audio>
-      </div>
-      <div v-if="meta.pictures" v-for="picture in meta.pictures" :key="picture.file" class="field">
-        <img class="ui medium bordered image" :src="picture.file" />
+      <div class="ui two column grid">
+        <div class="column" v-if="meta.pronunciations">
+          <div v-for="pronunciation in meta.pronunciations" :key="pronunciation.word" class="field">
+            <label>{{pronunciation.word}}</label>
+            <audio controls>
+              <source :src="pronunciation.sound" type="audio/mpeg">
+            </audio>
+          </div>
+        </div>
+        <div class="ui two column grid" v-if="meta.pictures">
+          <div class="column field" v-for="picture in meta.pictures" :key="picture.file">
+            <img class="ui fluid image bordered" :src="picture.file" />
+          </div>
+        </div>
       </div>
     </form>
   </article>

@@ -31,6 +31,7 @@ export async function get({ word, from, to }) {
     }
     await cacheJSON(result, cacheName);
     logger.info(`${cacheName} cached`);
+    await removeSession(session);
   } catch (err) {
     await removeSession(session);
     throw err;
