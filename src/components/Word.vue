@@ -79,7 +79,6 @@ export default {
         this.forvo.loading = true;
         const response = await this.$http.get(`forvo/de/${encodeURIComponent(this.word.front)}`);
         if (!response.body) return;
-        console.log(response);
         this.forvo.pronunciations = response.body;
       } finally {
         this.forvo.loading = false;
@@ -92,11 +91,7 @@ export default {
 
         if (!response.body) return;
 
-        console.log(response);
-        this.linguee.pronunciations = [{
-          word: this.word.front,
-          sound: response.body.pronunciation,
-        }];
+        this.linguee.pronunciations = response.body.pronunciations;
         this.linguee.translation = response.body.translation;
       } finally {
         this.linguee.loading = false;

@@ -21,10 +21,12 @@ export async function get({ params: { word, from, to } }, res) {
   const url = `https://www.linguee.com/${ISO6391.getName(from)}-${ISO6391.getName(to)}/search?source=${ISO6391.getName(from)}&query=${encodeURIComponent(word)}`;
   await session.go(url);
   const result = await session.executeScript(script);
-  if (result.pronunciation) {
-    const target = `${path.dirname(cacheName)}/${word.replace(' ', '-')}.mp3`;
-    await cacheMedia(result.pronunciation, target);
-    result.pronunciation = `/media/${target}`;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const pronunciation of result.pronunciations) {
+    const target = `${path.dirname(cacheName)}/${pronunciation.word.replace(' ', '-')}.mp3`;
+    // eslint-disable-next-line no-await-in-loop
+    await cacheMedia(pronunciation.sound, target);
+    pronunciation.sound = `/media/${target}`;
   }
   await cacheJSON(result, cacheName);
   logger.info(`${cacheName} cached`);
