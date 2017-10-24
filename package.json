@@ -26,7 +26,8 @@
     "vuex": "^3.0.0",
     "w3c-webdriver": "^0.0.11",
     "wait-on": "^2.0.2",
-    "winston": "^2.4.0"
+    "winston": "^2.4.0",
+    "perfy": "^1.1.2"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

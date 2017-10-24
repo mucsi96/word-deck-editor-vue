@@ -5,6 +5,7 @@ const sessionOption = {
   desiredCapabilities: {
     browserName: 'chrome',
     javascriptEnabled: true,
+    acceptSslCerts: true,
     chromeOptions: {
       args: ['incognito', 'headless', 'no-sandbox', 'disable-gpu'],
     },

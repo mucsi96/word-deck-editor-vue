@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import perfy from 'perfy';
 import { create as createSession, remove as removeSession } from '../session';
 import { getJSONCache, cacheMedia, cacheJSON } from '../cache';
 import logger from '../logger';
@@ -15,6 +16,7 @@ function makeURLCompatible(value) {
 }
 
 export async function get({ word, lang }) {
+  perfy.start('forvo');
   const cacheName = `forvo/${lang}/${word.replace(' ', '-')}/index.json`;
   const cache = await getJSONCache(cacheName);
   if (cache) {
@@ -37,6 +39,7 @@ export async function get({ word, lang }) {
     }
     await cacheJSON(result, cacheName);
     logger.info(`${cacheName} cached`);
+    logger.info(perfy.end('forvo').summary);
     await removeSession(session);
   } catch (err) {
     await removeSession(session);

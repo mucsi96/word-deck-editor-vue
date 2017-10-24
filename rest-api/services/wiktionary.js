@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import perfy from 'perfy';
 import { create as createSession, remove as removeSession } from '../session';
 import { getJSONCache, cacheJSON, cacheMedia } from '../cache';
 import logger from '../logger';
@@ -7,6 +8,7 @@ import logger from '../logger';
 const script = fs.readFileSync(path.resolve(__dirname, '../inject-scripts/wiktionary.js'), 'utf8');
 
 export async function get({ word, lang }) {
+  perfy.start('wiktionary');
   const cacheName = `wiktionary/${lang}/${word.replace(' ', '-')}/index.json`;
   const cache = await getJSONCache(cacheName);
   if (cache) {
@@ -40,6 +42,7 @@ export async function get({ word, lang }) {
     }
     await cacheJSON(result, cacheName);
     logger.info(`${cacheName} cached`);
+    logger.info(perfy.end('wiktionary').summary);
     await removeSession(session);
   } catch (err) {
     await removeSession(session);

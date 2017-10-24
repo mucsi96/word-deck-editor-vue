@@ -1,4 +1,6 @@
 import ISO6391 from 'iso-639-1';
+import perfy from 'perfy';
+import logger from '../logger';
 import { get as getLingueeMeta } from '../services/linguee';
 import { get as getForvoMeta } from '../services/forvo';
 import { get as getWiktionaryMeta } from '../services/wiktionary';
@@ -6,6 +8,7 @@ import { get as getGoogleMeta } from '../services/google';
 
 export const get = async ({ params: { word, lang } }, res) => {
   if (!ISO6391.validate(lang)) throw new Error(`Not valid language ${lang}`);
+  perfy.start('meta');
   const lingueeMeta = await getLingueeMeta({ word, from: lang, to: lang === 'en' ? 'de' : 'en' });
   const results = await Promise.all([
     getForvoMeta({ word, lang }),
@@ -28,5 +31,6 @@ export const get = async ({ params: { word, lang } }, res) => {
       ...results[3].pictures,
     ],
   };
+  logger.info(perfy.end('meta').summary);
   res.send(result);
 };
