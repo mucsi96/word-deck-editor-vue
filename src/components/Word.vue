@@ -73,7 +73,7 @@ export default {
       try {
         this.loading = true;
         this.meta = {};
-        const response = await this.$http.get(`meta/de/${encodeURIComponent(this.word.front)}`);
+        const response = await this.$http.get(`meta/${encodeURIComponent(this.word.frontLanguage)}/${encodeURIComponent(this.word.front)}`);
         if (!response.body) return;
         Object.assign(this.meta, response.body);
       } finally {

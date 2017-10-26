@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import ISO6391 from 'iso-639-1';
+import { getName as getLangName } from 'iso-639-1';
 import { create as createSession, remove as removeSession } from '../session';
 import { getJSONCache, cacheMedia, cacheJSON } from '../cache';
 import logger from '../logger';
@@ -18,7 +18,7 @@ export async function get({ word, from, to }) {
   const session = await createSession();
   let result = null;
   try {
-    const url = `https://www.linguee.com/${ISO6391.getName(from)}-${ISO6391.getName(to)}/search?source=${ISO6391.getName(from)}&query=${encodeURIComponent(word)}`;
+    const url = `https://www.linguee.com/${getLangName(from)}-${getLangName(to)}/search?source=${getLangName(from)}&query=${encodeURIComponent(word)}`;
     await session.go(url);
     result = await session.executeScript(script);
     logger.info('linguee', result);

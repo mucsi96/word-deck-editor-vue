@@ -1,11 +1,11 @@
-import ISO6391 from 'iso-639-1';
+import { validate as validateLang } from 'iso-639-1';
 import { get as getLingueeMeta } from '../services/linguee';
 import { get as getForvoMeta } from '../services/forvo';
 import { get as getWiktionaryMeta } from '../services/wiktionary';
 import { get as getGoogleMeta } from '../services/google';
 
 export const get = async ({ params: { word, lang } }, res) => {
-  if (!ISO6391.validate(lang)) throw new Error(`Not valid language ${lang}`);
+  if (!validateLang(lang)) throw new Error(`Not valid language ${lang}`);
   const lingueeMeta = await getLingueeMeta({ word, from: lang, to: lang === 'en' ? 'de' : 'en' });
   const results = await Promise.all([
     getForvoMeta({ word, lang }),
