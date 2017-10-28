@@ -11,10 +11,10 @@ const getIPA = () => {
 const getFileName = path => path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'));
 
 const getPronunciations = () => Array.prototype.map.call(
-  document.querySelectorAll('a.internal[href$=".ogg"],a.internal[href$=".mp3"],a[download][href$=".ogg"],a[download][href$=".mp3"]'),
-  link => ({
-    word: getFileName(link.getAttribute('href')),
-    sound: `${window.location.protocol}${link.getAttribute('href')}`,
+  document.querySelectorAll('audio source'),
+  element => ({
+    word: getFileName(element.getAttribute('src')),
+    sound: `${window.location.protocol}${element.getAttribute('src')}`,
   }),
 );
 

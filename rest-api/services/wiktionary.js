@@ -23,13 +23,6 @@ export async function get({ word, lang }) {
     const searchButton = await session.findElement('css', '#searchButton');
     await searchInput.sendKeys(word);
     await searchButton.click();
-    await session.executeScript(`Array.prototype.map.call(
-      document.querySelectorAll('.mwPlayerContainer.k-player'),
-      (player) => {
-        player.querySelector('.k-options').click();
-        player.querySelector('.k-download-btn').click();
-      },
-    )`);
     result = await session.executeScript(script);
     // eslint-disable-next-line no-restricted-syntax
     for (const pronunciation of result.pronunciations) {
