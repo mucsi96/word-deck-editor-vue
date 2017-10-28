@@ -14,7 +14,7 @@
       <div v-if="mode === 'image'">
         <div class="field">
           <label><i class="large paste icon"></i></label>
-          <textarea rows="1" v-model="backs" @paste="pasteImage"></textarea>
+          <textarea rows="1" v-model="back.items" @paste="pasteImage"></textarea>
         </div>
         <div class="field">
           <label><i class="large image icon"></i></label>
@@ -22,45 +22,46 @@
         </div>
       </div>
       <div class="ui horizontal segments">
-        <div class="ui segment">
+        <div class="ui segment" :class="{ loading: front.loading }">
           <div class="ui block header"><i class="large crosshairs icon"></i></div>
-          <div class="field" v-if="frontLanguage">
+          <div class="field" v-if="front.language">
             <label><i class="large flag outline icon"></i></label>
-            <select class="ui dropdown" v-model="frontLanguage">
+            <select class="ui dropdown" v-model="front.language">
               <option v-for="language in languages" :key="language.code" :value="language.code">{{language.name}}</option>
             </select>
           </div>
           <div class="field">
             <label><i class="large align justify icon"></i></label>
-            <textarea rows="10" v-model="fronts"></textarea>
+            <textarea :lang="front.language" spellcheck rows="10" v-model="front.items"></textarea>
           </div>
           <div class="field">
-            <button type="button" @click="fronts = ocrImage()" class="ui button primary icon"><i class="write icon"></i></button>
+            <button type="button" @click="front.items = ocrImage('front')" class="ui button primary icon"><i class="write icon"></i></button>
           </div>
         </div>
-        <div class="ui segment">
+        <div class="ui segment" :class="{ loading: back.loading }">
           <div class="ui block header"><i class="large comment outline icon"></i></div>
-          <div class="field" v-if="backLanguage">
+          <div class="field" v-if="back.language">
             <label><i class="large flag outline icon"></i></label>
-            <select class="ui dropdown" v-model="backLanguage">
+            <select class="ui dropdown" v-model="back.language">
               <option v-for="language in languages" :key="language.code" :value="language.code">{{language.name}}</option>
             </select>
           </div>
           <div class="field">
             <label><i class="large align justify icon"></i></label>
-            <textarea rows="10" v-model="backs"></textarea>
+            <textarea :lang="back.language" spellcheck rows="10" v-model="back.items"></textarea>
           </div>
           <div class="field">
-            <button type="button" @click="backs = ocrImage()" class="ui button primary icon"><i class="write icon"></i></button>
+            <button type="button" @click="back.items = ocrImage('back')" class="ui button primary icon"><i class="write icon"></i></button>
           </div>
         </div>
       </div>
-      <button class="ui icon big primary button"><i class="checkmark icon"></i></button>
+      <button class="ui icon big primary button" :disabled="!this.front.items"><i class="checkmark icon"></i></button>
     </form>
   </article>
 </template>
 
 <script>
+/* global Tesseract */
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.min.css';
 
@@ -71,8 +72,16 @@ export default {
       mode: localStorage.getItem('newWordMode') || 'text',
       loading: false,
       languages: [],
-      fronts: '',
-      backs: '',
+      front: {
+        language: localStorage.getItem('frontLanguage') || 'de',
+        items: '',
+        loading: false,
+      },
+      back: {
+        language: localStorage.getItem('backLanguage') || 'en',
+        items: '',
+        loading: false,
+      },
     };
   },
   created() {
@@ -93,30 +102,42 @@ export default {
       reader.onload = ({ target: { result } }) => {
         const image = document.getElementById('pastedImage');
         image.src = result;
-        this.cropper = new Cropper(image);
+        this.cropper = new Cropper(image, {
+          autoCrop: false,
+        });
       };
       reader.readAsDataURL(blob.getAsFile());
     },
-    ocrImage() {
-      return JSON.stringify(this.cropper.getData());
+    ocrImage(side) {
+      const section = side === 'front' ? this.front : this.back;
+      section.loading = true;
+      const croppedCanvas = this.cropper.getCroppedCanvas();
+      this.cropper.clear();
+      Tesseract.recognize(croppedCanvas, {
+        lang: this.languages.find(lang => lang.code === section.language).code3,
+      })
+        .then(({ text }) => {
+          section.loading = false;
+          section.items = text.trim();
+        });
     },
     submit(event) {
       event.preventDefault();
-      const backs = this.backs.toString().split('\n');
-      const words = this.fronts.toString().split('\n').map((front, index) => ({
+      const backItems = this.back.items.toString().split('\n');
+      const words = this.front.items.toString().split('\n').map((front, index) => ({
         front,
-        back: backs[index],
-        frontLanguage: this.frontLanguage,
-        backLanguage: this.backLanguage,
+        back: backItems[index],
+        frontLanguage: this.front.language,
+        backLanguage: this.back.language,
       }));
-      localStorage.setItem('frontLanguage', this.frontLanguage);
-      localStorage.setItem('backLanguage', this.backLanguage);
+      localStorage.setItem('frontLanguage', this.front.language);
+      localStorage.setItem('backLanguage', this.back.language);
       this.$store.commit('addNewWords', words);
+      this.front.items = '';
+      this.back.items = '';
     },
     async fetchData() {
       try {
-        this.frontLanguage = localStorage.getItem('frontLanguage') || 'de';
-        this.backLanguage = localStorage.getItem('backLanguage') || 'en';
         this.loading = true;
         const response = await this.$http.get('languages');
         if (!response.body) return;

@@ -13,7 +13,6 @@
     </main>
   </div>
 </template>
-
 <script>
 import 'semantic-ui-css/semantic.css';
 
