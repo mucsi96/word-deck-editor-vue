@@ -1,15 +1,14 @@
 <template>
   <article class="ui segment">
-    <h4 class="ui header">Word</h4>
     <form class="ui form" :key="word.front" :class="{ loading }">
       <div class="field" v-if="word.back">
         <div class="two fields">
           <div class="field">
-            <label>Front</label>
+            <label><i class="large crosshairs icon"></i></label>
             <input type="text" v-model="word.front" readonly>
           </div>
           <div class="field">
-            <label>Back</label>
+            <label><i class="large comment outline icon"></i></label>
             <input type="text" v-model="word.back" >
           </div>
         </div>

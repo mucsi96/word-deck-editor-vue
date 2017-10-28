@@ -1,5 +1,5 @@
 <template>
-  <article class="ui vertical fluid menu">
+  <article class="ui vertical fluid icon menu">
     <router-link
       class="item"
       v-for="word in deck"
@@ -13,7 +13,7 @@
       to="/add-new-words"
       class="item"
     >
-      <div class="header">Add new words</div>
+      <i class="plus icon"></i>
     </router-link>
   </article>
 </template>

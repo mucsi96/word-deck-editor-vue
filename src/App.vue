@@ -1,7 +1,7 @@
 <template>
   <div>
     <Masthead />
-    <main class="ui main container">
+    <main>
       <div class="ui grid">
         <div class="four wide column">
           <Deck />
@@ -30,7 +30,13 @@ export default {
 </script>
 
 <style scoped>
-.main.container {
+main {
   margin-top: 4em;
+  margin-left: 8em;
+  margin-right: 8em;
+}
+
+.large.icon {
+  font-size: 2em;
 }
 </style>
