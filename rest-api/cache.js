@@ -3,6 +3,7 @@ import path from 'path';
 import http from 'http';
 import https from 'https';
 import mkdirpCb from 'mkdirp';
+import uid from 'uid-safe';
 
 const base = path.resolve(__dirname, '../cache');
 
@@ -45,10 +46,17 @@ const readJSON = source => new Promise((resolve, reject) => {
   });
 });
 
-export const cacheMedia = async (url, target) => {
-  const fileName = path.resolve(base, target);
+export const cacheMedia = async (url, target, suggestedfileName) => {
+  const targetName = (suggestedfileName || path.basename(url).split('?')[0])
+    .replace(/ /g, '-')
+    .replace(/[?]/g, '')
+    .toLowerCase();
+  const ext = path.extname(targetName);
+  const uid6 = await uid(6);
+  const fileName = path.resolve(base, target, `${path.basename(targetName, ext)}-${uid6}${ext}`);
   await mkdirp(path.dirname(fileName));
   await downloadHTTP(url, fileName);
+  return path.join(target, path.basename(fileName));
 };
 
 export const cacheJSON = async (data, target) => {
