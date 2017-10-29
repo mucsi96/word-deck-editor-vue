@@ -5,7 +5,7 @@
         <div class="two fields">
           <div class="field">
             <label><i class="large crosshairs icon"></i></label>
-            <input type="text" v-model="word.front" readonly>
+            <input type="text" v-model="word.front">
           </div>
           <div class="field">
             <label><i class="large comment outline icon"></i></label>
@@ -13,30 +13,40 @@
           </div>
         </div>
       </div>
-      <div class="field" v-if="meta.wordClass">
-        <label>Class</label>
-        <input type="text" v-model="meta.wordClass" readonly>
-      </div>
-      <div class="field" v-if="meta.gender">
-        <label>Gender</label>
-        <input type="text" v-model="meta.gender" readonly>
-      </div>
-      <div class="field" v-if="meta.ipa">
-        <label>IPA</label>
-        <input type="text" v-model="meta.ipa" readonly>
-      </div>
-      <div class="ui two column grid">
-        <div class="column" v-if="meta.pronunciations">
-          <div v-for="pronunciation in meta.pronunciations" :key="pronunciation.word" class="field">
-            <label>{{pronunciation.word}}</label>
-            <audio controls>
-              <source :src="pronunciation.sound" type="audio/mpeg">
-            </audio>
+      <div class="field">
+        <div class="three fields">
+          <div class="field" v-if="meta.wordClass">
+            <label>Class</label>
+            <input type="text" v-model="meta.wordClass" readonly>
+          </div>
+          <div class="field" v-if="meta.gender">
+            <label>Gender</label>
+            <input type="text" v-model="meta.gender" readonly>
+          </div>
+          <div class="field" v-if="meta.ipa">
+            <label>IPA</label>
+            <input type="text" v-model="meta.ipa" readonly>
           </div>
         </div>
-        <div class="ui two column grid" v-if="meta.pictures">
-          <div class="column field" v-for="picture in meta.pictures" :key="picture.file">
-            <img class="ui fluid image bordered" :src="picture.file" />
+      </div>
+      <div class="ui grid">
+        <div class="four wide column" v-if="meta.pronunciations">
+          <div class="ui two cards">
+            <PronuncicationCard
+              v-for="pronunciation in meta.pronunciations"
+              :key="pronunciation.sound"
+              :word="pronunciation.word"
+              :sound="pronunciation.sound"
+            />
+          </div>
+        </div>
+        <div class="twelve wide column" v-if="meta.pictures">
+          <div class="ui five cards">
+            <PictureCard
+              v-for="picture in meta.pictures"
+              :key="picture.file"
+              :image="picture.file"
+            />
           </div>
         </div>
       </div>
@@ -45,6 +55,9 @@
 </template>
 
 <script>
+import PronuncicationCard from '@/components/PronuncicationCard';
+import PictureCard from '@/components/PictureCard';
+
 export default {
   name: 'Word',
   data() {
@@ -79,6 +92,10 @@ export default {
         this.loading = false;
       }
     },
+  },
+  components: {
+    PronuncicationCard,
+    PictureCard,
   },
 };
 </script>
