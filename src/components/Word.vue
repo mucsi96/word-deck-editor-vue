@@ -1,6 +1,6 @@
 <template>
   <article class="ui segment">
-    <form class="ui form" :key="word.front" :class="{ loading }">
+    <form class="ui form" :class="{ loading }">
       <div class="field" v-if="word.back">
         <div class="two fields">
           <div class="field">
@@ -37,6 +37,10 @@
               :key="pronunciation.sound"
               :word="pronunciation.word"
               :sound="pronunciation.sound"
+              :pined="word.pronunciations === pronunciation.sound"
+              :pinedPhrase="word.pronunciationsPhrase === pronunciation.sound"
+              @pin="pinPronunciation(pronunciation.sound)"
+              @pinPhrase="pinPronunciationPhrase(pronunciation.sound)"
             />
           </div>
         </div>
@@ -46,6 +50,8 @@
               v-for="picture in meta.pictures"
               :key="picture.file"
               :image="picture.file"
+              :pined="word.picture === picture.file"
+              @pin="pinPicture(picture.file)"
             />
           </div>
         </div>
@@ -61,8 +67,11 @@ import PictureCard from '@/components/PictureCard';
 export default {
   name: 'Word',
   data() {
+    const { deck } = this.$store.state;
+    const { id } = this.$route.params;
+    const match = deck.find(word => encodeURIComponent(word.front) === id);
     return {
-      word: {},
+      word: match || {},
       meta: {},
       loading: false,
     };
@@ -70,24 +79,27 @@ export default {
   created() {
     this.fetchData();
   },
-  watch: {
-    $route: 'fetchData',
-  },
   methods: {
+    pinPronunciation(sound) {
+      this.$store.commit('updateWord', { word: this.word.front, prop: 'pronunciations', value: sound });
+    },
+    pinPronunciationPhrase(sound) {
+      this.$store.commit('updateWord', { word: this.word.front, prop: 'pronunciationsPhrase', value: sound });
+    },
+    pinPicture(picture) {
+      this.$store.commit('updateWord', { word: this.word.front, prop: 'picture', value: picture });
+    },
     async fetchData() {
-      const { deck } = this.$store.state;
-      const { id } = this.$route.params;
-      const match = deck.find(word => encodeURIComponent(word.front) === id);
-      this.word = match || {};
-      if (!match) {
-        return;
-      }
+      if (!this.word.front) return;
       try {
         this.loading = true;
         this.meta = {};
         const response = await this.$http.get(`meta/${encodeURIComponent(this.word.frontLanguage)}/${encodeURIComponent(this.word.front.toLowerCase())}`);
         if (!response.body) return;
         Object.assign(this.meta, response.body);
+        if (!this.word.pronunciations && response.body.pronunciations.length) {
+          this.pinPronunciation(response.body.pronunciations[0].sound);
+        }
       } finally {
         this.loading = false;
       }

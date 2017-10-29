@@ -14,10 +14,10 @@
       </div>
     </div>
     <div class="ui bottom attached icon buttons">
-      <button type="button" class="ui button">
+      <button type="button" class="ui button" :class="{ pink: pined }" @click="$emit('pin')">
         <i class="pin icon"></i>
       </button>
-      <button type="button" class="ui button">
+      <button type="button" class="ui button" :class="{ pink: pinedPhrase }" @click="$emit('pinPhrase')">
         <i class="talk outline icon"></i>
       </button>
     </div>
@@ -26,7 +26,7 @@
 <script>
 export default {
   name: 'PronuncicationCard',
-  props: ['word', 'sound'],
+  props: ['word', 'sound', 'pined', 'pinedPhrase'],
   methods: {
     playAudio() {
       this.$refs.audio.play();
