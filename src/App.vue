@@ -2,14 +2,7 @@
   <div>
     <Masthead />
     <main>
-      <div class="ui grid">
-        <div class="four wide column">
-          <Deck />
-        </div>
-        <div class="twelve wide stretched column">
-          <router-view/>
-        </div>
-      </div>
+      <router-view/>
     </main>
   </div>
 </template>
@@ -17,13 +10,11 @@
 import 'semantic-ui-css/semantic.css';
 
 import Masthead from '@/components/Masthead';
-import Deck from '@/components/Deck';
 
 export default {
   name: 'app',
   components: {
     Masthead,
-    Deck,
   },
 };
 </script>

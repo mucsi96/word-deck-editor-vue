@@ -1,63 +1,77 @@
 <template>
-  <article class="ui segment">
-    <form class="ui form" @submit="submit" :class="{ loading }">
-      <div class="field">
-        <div class="basic large ui buttons">
-          <button type="button" class="ui icon button" :class="{ active: mode === 'text' }" @click="setMode('text')">
-            <i class="font icon"></i>
-          </button>
-          <button type="button" class="ui icon button" :class="{ active: mode === 'image' }" @click="setMode('image')">
-            <i class="photo icon"></i>
-          </button>
-        </div>
-      </div>
-      <div v-if="mode === 'image'">
-        <div class="field">
-          <label><i class="large paste icon"></i></label>
-          <textarea rows="1" v-model="back.items" @paste="pasteImage"></textarea>
-        </div>
-        <div class="field">
-          <label><i class="large image icon"></i></label>
-          <img id="pastedImage" class="fluid image">
-        </div>
-      </div>
-      <div class="ui horizontal segments">
-        <div class="ui segment" :class="{ loading: front.loading }">
-          <div class="ui block header"><i class="large crosshairs icon"></i></div>
-          <div class="field" v-if="front.language">
-            <label><i class="large flag outline icon"></i></label>
-            <select class="ui dropdown" v-model="front.language">
-              <option v-for="language in languages" :key="language.code" :value="language.code">{{language.name}}</option>
-            </select>
+  <div class="ui grid">
+    <div :class="[(mode === 'image' ? 'five' : 'sixteen'), 'wide', 'column']" >
+      <article class="ui segment">
+        <form class="ui form" @submit="submit" :class="{ loading }">
+          <div class="field">
+            <div class="basic large ui buttons">
+              <button type="button" class="ui icon button" :class="{ active: mode === 'text' }" @click="setMode('text')">
+                <i class="font icon"></i>
+              </button>
+              <button type="button" class="ui icon button" :class="{ active: mode === 'image' }" @click="setMode('image')">
+                <i class="photo icon"></i>
+              </button>
+            </div>
+          </div>
+          <div class="ui horizontal segments">
+            <div class="ui segment" :class="{ loading: front.loading }">
+              <div class="ui block header"><i class="large crosshairs icon"></i></div>
+              <div class="field" v-if="front.language">
+                <label><i class="large flag outline icon"></i></label>
+                <select class="ui dropdown" v-model="front.language">
+                  <option v-for="language in languages" :key="language.code" :value="language.code">{{language.name}}</option>
+                </select>
+              </div>
+              <div class="field">
+                <label><i class="large align justify icon"></i></label>
+                <textarea :lang="front.language" spellcheck rows="10" v-model="front.items"></textarea>
+              </div>
+              <div class="field" v-if="mode === 'image'">
+                <button type="button" @click="front.items = ocrImage('front')" class="ui button primary icon"><i class="write icon"></i></button>
+              </div>
+            </div>
+            <div class="ui segment" :class="{ loading: back.loading }">
+              <div class="ui block header"><i class="large comment outline icon"></i></div>
+              <div class="field" v-if="back.language">
+                <label><i class="large flag outline icon"></i></label>
+                <select class="ui dropdown" v-model="back.language">
+                  <option v-for="language in languages" :key="language.code" :value="language.code">{{language.name}}</option>
+                </select>
+              </div>
+              <div class="field">
+                <label><i class="large align justify icon"></i></label>
+                <textarea :lang="back.language" spellcheck rows="10" v-model="back.items"></textarea>
+              </div>
+              <div class="field" v-if="mode === 'image'">
+                <button type="button" @click="back.items = ocrImage('back')" class="ui button primary icon"><i class="write icon"></i></button>
+              </div>
+            </div>
+          </div>
+          <router-link
+            to="/"
+            class="ui basic big icon button"
+          >
+            <i class="arrow left icon"></i>
+          </router-link>
+          <button class="ui icon big primary button" :disabled="!this.front.items"><i class="checkmark icon"></i></button>
+        </form>
+      </article>
+    </div>
+    <div class="eleven wide stretched column" v-if="mode === 'image'">
+      <article class="ui segment">
+        <form class="ui form">
+          <div class="field">
+            <label><i class="large paste icon"></i></label>
+            <textarea rows="1" v-model="back.items" @paste="pasteImage"></textarea>
           </div>
           <div class="field">
-            <label><i class="large align justify icon"></i></label>
-            <textarea :lang="front.language" spellcheck rows="10" v-model="front.items"></textarea>
+            <label><i class="large image icon"></i></label>
+            <img id="pastedImage" class="fluid image">
           </div>
-          <div class="field">
-            <button type="button" @click="front.items = ocrImage('front')" class="ui button primary icon"><i class="write icon"></i></button>
-          </div>
-        </div>
-        <div class="ui segment" :class="{ loading: back.loading }">
-          <div class="ui block header"><i class="large comment outline icon"></i></div>
-          <div class="field" v-if="back.language">
-            <label><i class="large flag outline icon"></i></label>
-            <select class="ui dropdown" v-model="back.language">
-              <option v-for="language in languages" :key="language.code" :value="language.code">{{language.name}}</option>
-            </select>
-          </div>
-          <div class="field">
-            <label><i class="large align justify icon"></i></label>
-            <textarea :lang="back.language" spellcheck rows="10" v-model="back.items"></textarea>
-          </div>
-          <div class="field">
-            <button type="button" @click="back.items = ocrImage('back')" class="ui button primary icon"><i class="write icon"></i></button>
-          </div>
-        </div>
-      </div>
-      <button class="ui icon big primary button" :disabled="!this.front.items"><i class="checkmark icon"></i></button>
-    </form>
-  </article>
+        </form>
+      </article>
+    </div>
+  </div>
 </template>
 
 <script>

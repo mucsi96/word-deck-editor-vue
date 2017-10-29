@@ -1,9 +1,12 @@
 <template>
   <header class="ui fixed inverted menu">
     <div class="ui container">
-      <span class="header item">
+      <router-link
+        to="/"
+        class="header item"
+      >
         Word Deck Editor
-      </span>
+      </router-link>
     </div>
   </header>
 </template>
