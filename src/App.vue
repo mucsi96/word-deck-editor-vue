@@ -19,7 +19,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 main {
   margin-top: 4em;
   margin-left: 8em;
@@ -28,5 +28,9 @@ main {
 
 .large.icon {
   font-size: 2em;
+}
+
+.invisible {
+  visibility: hidden;
 }
 </style>

@@ -1,17 +1,11 @@
 <template>
   <div class="ui grid">
-    <div :class="[(mode === 'image' ? 'five' : 'sixteen'), 'wide', 'column']" >
+    <div :class="[(cropper ? 'five' : 'sixteen'), 'wide', 'column']" >
       <article class="ui segment">
         <form class="ui form" @submit="submit" :class="{ loading }">
           <div class="field">
-            <div class="basic large ui buttons">
-              <button type="button" class="ui icon button" :class="{ active: mode === 'text' }" @click="setMode('text')">
-                <i class="font icon"></i>
-              </button>
-              <button type="button" class="ui icon button" :class="{ active: mode === 'image' }" @click="setMode('image')">
-                <i class="photo icon"></i>
-              </button>
-            </div>
+            <label><i class="large photo icon"></i></label>
+            <textarea rows="1" @paste="pasteImage"></textarea>
           </div>
           <div class="ui horizontal segments">
             <div class="ui segment" :class="{ loading: front.loading }">
@@ -23,11 +17,11 @@
                 </select>
               </div>
               <div class="field">
-                <label><i class="large align justify icon"></i></label>
-                <textarea :lang="front.language" spellcheck rows="10" v-model="front.items"></textarea>
-              </div>
-              <div class="field" v-if="mode === 'image'">
-                <button type="button" @click="front.items = ocrImage('front')" class="ui button primary icon"><i class="write icon"></i></button>
+                <label>
+                  <i class="large align justify icon"></i>
+                  <button v-if="cropper" type="button" @click="ocrImage('front')" class="ui button icon"><i class="crop icon"></i></button>
+                </label>
+                <textarea :lang="front.language" spellcheck :rows="front.items.split('\n').length || 10" v-model="front.items"></textarea>
               </div>
             </div>
             <div class="ui segment" :class="{ loading: back.loading }">
@@ -39,11 +33,11 @@
                 </select>
               </div>
               <div class="field">
-                <label><i class="large align justify icon"></i></label>
-                <textarea :lang="back.language" spellcheck rows="10" v-model="back.items"></textarea>
-              </div>
-              <div class="field" v-if="mode === 'image'">
-                <button type="button" @click="back.items = ocrImage('back')" class="ui button primary icon"><i class="write icon"></i></button>
+                <label>
+                  <i class="large align justify icon"></i>
+                  <button v-if="cropper" type="button" @click="ocrImage('back')" class="ui button icon"><i class="crop icon"></i></button>
+                </label>
+                <textarea :lang="back.language" spellcheck :rows="back.items.split('\n').length || 10" v-model="back.items"></textarea>
               </div>
             </div>
           </div>
@@ -57,15 +51,14 @@
         </form>
       </article>
     </div>
-    <div class="eleven wide stretched column" v-if="mode === 'image'">
+    <div class="eleven wide stretched column" :class="{ invisible: !cropper }">
       <article class="ui segment">
         <form class="ui form">
           <div class="field">
-            <label><i class="large paste icon"></i></label>
-            <textarea rows="1" v-model="back.items" @paste="pasteImage"></textarea>
-          </div>
-          <div class="field">
-            <label><i class="large image icon"></i></label>
+            <label>
+              <button type="button" @click="cropper.zoom(0.1)" class="ui button icon"><i class="zoom icon"></i></button>
+              <button type="button" @click="cropper.zoom(-0.1)" class="ui button icon"><i class="zoom out icon"></i></button>
+            </label>
             <img id="pastedImage" class="fluid image">
           </div>
         </form>
@@ -96,6 +89,7 @@ export default {
         items: '',
         loading: false,
       },
+      cropper: null,
     };
   },
   created() {
@@ -118,6 +112,7 @@ export default {
         image.src = result;
         this.cropper = new Cropper(image, {
           autoCrop: false,
+          zoomOnWheel: false,
         });
       };
       reader.readAsDataURL(blob.getAsFile());
@@ -132,8 +127,20 @@ export default {
       })
         .then(({ text }) => {
           section.loading = false;
-          section.items = text.trim();
+          this.saveText(side, text);
         });
+    },
+    saveText(side, text) {
+      const section = side === 'front' ? this.front : this.back;
+      section.items = text
+        .trim()
+        .split('\n')
+        .map(line => line.split(',')[0])
+        .map(line => line.replace(/^[-.]/, ''))
+        .map(line => (section.language === 'de' ? line.replace(/der |die |das /, '') : line))
+        .map(line => line.trim())
+        .filter(line => line)
+        .join('\n');
     },
     submit(event) {
       event.preventDefault();
