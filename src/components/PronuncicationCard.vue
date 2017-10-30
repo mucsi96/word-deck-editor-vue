@@ -14,10 +14,10 @@
       </div>
     </div>
     <div class="ui bottom attached icon buttons">
-      <button type="button" class="ui button" :class="{ pink: pined }" @click="$emit('pin')">
+      <button type="button" class="ui button" :class="{ pink: pined }" @click="togglePin">
         <i class="pin icon"></i>
       </button>
-      <button type="button" class="ui button" :class="{ pink: pinedPhrase }" @click="$emit('pinPhrase')">
+      <button type="button" class="ui button" :class="{ pink: pinedPhrase }" @click="togglePinPhrase">
         <i class="talk outline icon"></i>
       </button>
     </div>
@@ -30,6 +30,20 @@ export default {
   methods: {
     playAudio() {
       this.$refs.audio.play();
+    },
+    togglePin() {
+      if (!this.pined) {
+        this.$emit('pin');
+      } else {
+        this.$emit('unpin');
+      }
+    },
+    togglePinPhrase() {
+      if (!this.pinedPhrase) {
+        this.$emit('pinPhrase');
+      } else {
+        this.$emit('unpinPhrase');
+      }
     },
   },
 };

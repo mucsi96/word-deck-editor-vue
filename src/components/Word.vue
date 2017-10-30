@@ -37,10 +37,12 @@
               :key="pronunciation.sound"
               :word="pronunciation.word"
               :sound="pronunciation.sound"
-              :pined="word.pronunciations === pronunciation.sound"
-              :pinedPhrase="word.pronunciationsPhrase === pronunciation.sound"
+              :pined="word.pronunciation === pronunciation.sound"
+              :pinedPhrase="word.pronunciationPhrase === pronunciation.sound"
               @pin="pinPronunciation(pronunciation.sound)"
+              @unpin="pinPronunciation(undefined)"
               @pinPhrase="pinPronunciationPhrase(pronunciation.sound)"
+              @unpinPhrase="pinPronunciationPhrase(undefined)"
             />
           </div>
         </div>
@@ -52,6 +54,7 @@
               :image="picture.file"
               :pined="word.picture === picture.file"
               @pin="pinPicture(picture.file)"
+              @unpin="pinPicture(undefined)"
             />
           </div>
         </div>
@@ -67,24 +70,21 @@ import PictureCard from '@/components/PictureCard';
 export default {
   name: 'Word',
   data() {
-    const { deck } = this.$store.state;
-    const { id } = this.$route.params;
-    const match = deck.find(word => encodeURIComponent(word.front) === id);
     return {
-      word: match || {},
       meta: {},
       loading: false,
     };
   },
+  props: ['word'],
   created() {
     this.fetchData();
   },
   methods: {
     pinPronunciation(sound) {
-      this.$store.commit('updateWord', { word: this.word.front, prop: 'pronunciations', value: sound });
+      this.$store.commit('updateWord', { word: this.word.front, prop: 'pronunciation', value: sound });
     },
     pinPronunciationPhrase(sound) {
-      this.$store.commit('updateWord', { word: this.word.front, prop: 'pronunciationsPhrase', value: sound });
+      this.$store.commit('updateWord', { word: this.word.front, prop: 'pronunciationPhrase', value: sound });
     },
     pinPicture(picture) {
       this.$store.commit('updateWord', { word: this.word.front, prop: 'picture', value: picture });

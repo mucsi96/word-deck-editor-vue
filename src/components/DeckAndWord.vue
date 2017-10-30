@@ -4,7 +4,7 @@
       <Deck />
     </div>
     <div class="twelve wide stretched column">
-      <Word />
+      <Word :word="word" />
     </div>
   </div>
 </template>
@@ -18,6 +18,12 @@ export default {
   components: {
     Deck,
     Word,
+  },
+  computed: {
+    word() {
+      const { id } = this.$route.params;
+      return this.$store.getters.deck.find(word => encodeURIComponent(word.front) === id);
+    },
   },
 };
 </script>
