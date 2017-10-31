@@ -4,7 +4,7 @@
       <Deck :deck="deck" @refresh="refresh" />
     </div>
     <div v-if="word" class="twelve wide stretched column">
-      <Word :word="word" />
+      <Word :word="word" :meta="meta" />
     </div>
   </div>
 </template>
@@ -26,6 +26,9 @@ export default {
     word() {
       const { id } = this.$route.params;
       return this.$store.getters.deck.find(word => encodeURIComponent(word.front) === id);
+    },
+    meta() {
+      return this.$store.getters.meta;
     },
   },
   methods: {

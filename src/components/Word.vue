@@ -1,6 +1,6 @@
 <template>
   <article class="ui segment">
-    <form class="ui form" :class="{ loading }">
+    <form class="ui form" :class="{ loading: !Object.keys(meta).length }">
       <div class="field" v-if="word.back">
         <div class="two fields">
           <div class="field">
@@ -69,13 +69,7 @@ import PictureCard from '@/components/PictureCard';
 
 export default {
   name: 'Word',
-  data() {
-    return {
-      meta: {},
-      loading: false,
-    };
-  },
-  props: ['word'],
+  props: ['word', 'meta'],
   created() {
     this.fetchData();
   },
@@ -91,18 +85,7 @@ export default {
     },
     async fetchData() {
       if (!this.word.front) return;
-      try {
-        this.loading = true;
-        this.meta = {};
-        const response = await this.$http.get(`meta/${encodeURIComponent(this.word.frontLanguage)}/${encodeURIComponent(this.word.front.toLowerCase())}`);
-        if (!response.body) return;
-        Object.assign(this.meta, response.body);
-        if (!this.word.pronunciations && response.body.pronunciations.length) {
-          this.pinPronunciation(response.body.pronunciations[0].sound);
-        }
-      } finally {
-        this.loading = false;
-      }
+      await this.$store.dispatch('fetchWord', { word: this.word });
     },
   },
   components: {

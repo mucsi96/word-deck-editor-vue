@@ -137,7 +137,6 @@ export default {
         .split('\n')
         .map(line => line.split(',')[0])
         .map(line => line.replace(/^[-.]/, ''))
-        .map(line => (section.language === 'de' ? line.replace(/der |die |das /, '') : line))
         .map(line => line.trim())
         .filter(line => line)
         .join('\n');

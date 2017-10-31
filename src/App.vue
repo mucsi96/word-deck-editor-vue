@@ -31,18 +31,7 @@ export default {
     async preload() {
       const notPreloadedWord = this.deck.find(word => !word.preloading);
       if (notPreloadedWord) {
-        this.$store.commit('updateWord', { word: notPreloadedWord.front, prop: 'preloading', value: 'pending' });
-        const url = [
-          'meta',
-          encodeURIComponent(notPreloadedWord.frontLanguage),
-          encodeURIComponent(notPreloadedWord.front.toLowerCase()),
-        ].join('/');
-        try {
-          await this.$http.get(url);
-          this.$store.commit('updateWord', { word: notPreloadedWord.front, prop: 'preloading', value: 'done' });
-        } catch (err) {
-          this.$store.commit('updateWord', { word: notPreloadedWord.front, prop: 'preloading', value: 'failed' });
-        }
+        this.$store.dispatch('fetchWord', { word: notPreloadedWord, preload: true });
       }
       this.preloadTimeout = setTimeout(() => this.preload(), 1000);
     },
