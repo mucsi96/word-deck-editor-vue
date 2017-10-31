@@ -3,7 +3,7 @@
     <div class="four wide column">
       <Deck />
     </div>
-    <div class="twelve wide stretched column">
+    <div v-if="word" class="twelve wide stretched column">
       <Word :word="word" />
     </div>
   </div>

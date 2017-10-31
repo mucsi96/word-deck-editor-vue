@@ -1,21 +1,30 @@
 <template>
-  <article class="ui vertical fluid icon menu">
+  <article class="ui segments">
     <router-link
-      class="item"
       v-for="word in deck"
       :key="word.front"
+      tag="div"
+      class="ui center aligned segment"
+      :class="{
+        green: word.preloading === 'done',
+        loading: word.preloading === 'pending',
+        red: word.preloading === 'failed',
+      }"
       :to="{ name: 'word', params: { id: getWordId(word) }}"
-      :class="{ disabled: !word.preloaded }"
     >
-      <div class="header">{{word.front}}</div>
-      {{word.back}}
+        <h4 class="ui header">{{word.front}}</h4>
+        {{word.back}}
     </router-link>
     <router-link
+      tag="div"
+      class="ui center aligned blue segment"
       to="/add-new-words"
-      class="item"
     >
-      <i class="plus icon"></i>
+        <i class="plus icon"></i>
     </router-link>
+    <div class="ui center aligned red segment" @click="clear">
+      <i class="refresh icon"></i>
+    </div>
   </article>
 </template>
 
@@ -28,17 +37,34 @@ export default {
     },
   },
   created() {
-    setTimeout(() => this.preload(), 100);
+    if (!this.preloadTimeout) this.preload();
+  },
+  destroyed() {
+    if (this.preloadTimeout) clearTimeout(this.preloadTimeout);
   },
   methods: {
+    clear() {
+      this.deck.forEach((word) => {
+        this.$store.commit('updateWord', { word: word.front, prop: 'preloading', value: undefined });
+      });
+    },
     async preload() {
-      const notPreloadedWord = this.deck.find(word => !word.preloaded);
+      const notPreloadedWord = this.deck.find(word => !word.preloading);
       if (notPreloadedWord) {
-        console.log(`Preloading ${notPreloadedWord.front}...`);
-        await this.$http.get(`meta/${encodeURIComponent(notPreloadedWord.frontLanguage)}/${encodeURIComponent(notPreloadedWord.front.toLowerCase())}`);
-        this.$store.commit('updateWord', { word: notPreloadedWord.front, prop: 'preloaded', value: true });
+        this.$store.commit('updateWord', { word: notPreloadedWord.front, prop: 'preloading', value: 'pending' });
+        const url = [
+          'meta',
+          encodeURIComponent(notPreloadedWord.frontLanguage),
+          encodeURIComponent(notPreloadedWord.front.toLowerCase()),
+        ].join('/');
+        try {
+          await this.$http.get(url);
+          this.$store.commit('updateWord', { word: notPreloadedWord.front, prop: 'preloading', value: 'done' });
+        } catch (err) {
+          this.$store.commit('updateWord', { word: notPreloadedWord.front, prop: 'preloading', value: 'failed' });
+        }
       }
-      setTimeout(() => this.preload(), 100);
+      this.preloadTimeout = setTimeout(() => this.preload(), 1000);
     },
     getWordId(word) {
       return encodeURIComponent(word.front);
@@ -47,4 +73,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+  .segments > .segment {
+    cursor: pointer;
+  }
+</style>
