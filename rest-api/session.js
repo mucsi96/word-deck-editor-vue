@@ -1,5 +1,8 @@
+import fs from 'fs';
+import path from 'path';
 import { newSession } from 'w3c-webdriver';
 import logger from './logger';
+import { saveBuffer } from './cache';
 
 const sessionOption = {
   desiredCapabilities: {
@@ -32,4 +35,11 @@ export async function remove(session) {
   } catch (err) {
     logger.info('session already deleted');
   }
+}
+
+
+export async function takeScreenshot(session) {
+  const screenshot = await session.takeScreenshot();
+  const file = fs.createWriteStream(path.resolve(__dirname, `../screenshot-${Date.now()}.png`));
+  await saveBuffer(screenshot, file);
 }

@@ -4,6 +4,7 @@ import http from 'http';
 import https from 'https';
 import mkdirpCb from 'mkdirp';
 import uid from 'uid-safe';
+import { Readable } from 'stream';
 
 const base = path.resolve(__dirname, '../cache');
 
@@ -25,9 +26,26 @@ const downloadHTTP = (url, dest) => new Promise((resolve, reject) => {
   });
 });
 
+
 const saveJSON = (data, dest) => new Promise((resolve, reject) => {
   const content = JSON.stringify(data, null, 2);
   fs.writeFile(dest, content, 'utf8', err => (!err ? resolve() : reject(err)));
+});
+
+export const saveBuffer = (data, dest) => new Promise((resolve, reject) => {
+  const readable = new Readable();
+  const file = fs.createWriteStream(dest);
+
+  // eslint-disable-next-line no-underscore-dangle
+  readable._read = () => {};
+  readable.push(data);
+  readable.pipe(file);
+  file.on('finish', () => {
+    file.close(resolve);
+  });
+  file.on('error', (err) => {
+    reject(err);
+  });
 });
 
 const readJSON = source => new Promise((resolve, reject) => {
