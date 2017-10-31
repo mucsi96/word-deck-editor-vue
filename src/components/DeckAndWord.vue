@@ -1,7 +1,7 @@
 <template>
   <div class="ui grid">
     <div class="four wide column">
-      <Deck />
+      <Deck :deck="deck" @refresh="refresh" />
     </div>
     <div v-if="word" class="twelve wide stretched column">
       <Word :word="word" />
@@ -20,9 +20,19 @@ export default {
     Word,
   },
   computed: {
+    deck() {
+      return this.$store.getters.deck;
+    },
     word() {
       const { id } = this.$route.params;
       return this.$store.getters.deck.find(word => encodeURIComponent(word.front) === id);
+    },
+  },
+  methods: {
+    refresh() {
+      this.deck.forEach((word) => {
+        this.$store.commit('updateWord', { word: word.front, prop: 'preloading', value: undefined });
+      });
     },
   },
 };

@@ -22,7 +22,7 @@
     >
         <i class="plus icon"></i>
     </router-link>
-    <div class="ui center aligned red segment" @click="clear">
+    <div class="ui center aligned red segment" @click="$emit('refresh')">
       <i class="refresh icon"></i>
     </div>
   </article>
@@ -31,41 +31,8 @@
 <script>
 export default {
   name: 'Deck',
-  computed: {
-    deck() {
-      return this.$store.state.deck;
-    },
-  },
-  created() {
-    if (!this.preloadTimeout) this.preload();
-  },
-  destroyed() {
-    if (this.preloadTimeout) clearTimeout(this.preloadTimeout);
-  },
+  props: ['deck'],
   methods: {
-    clear() {
-      this.deck.forEach((word) => {
-        this.$store.commit('updateWord', { word: word.front, prop: 'preloading', value: undefined });
-      });
-    },
-    async preload() {
-      const notPreloadedWord = this.deck.find(word => !word.preloading);
-      if (notPreloadedWord) {
-        this.$store.commit('updateWord', { word: notPreloadedWord.front, prop: 'preloading', value: 'pending' });
-        const url = [
-          'meta',
-          encodeURIComponent(notPreloadedWord.frontLanguage),
-          encodeURIComponent(notPreloadedWord.front.toLowerCase()),
-        ].join('/');
-        try {
-          await this.$http.get(url);
-          this.$store.commit('updateWord', { word: notPreloadedWord.front, prop: 'preloading', value: 'done' });
-        } catch (err) {
-          this.$store.commit('updateWord', { word: notPreloadedWord.front, prop: 'preloading', value: 'failed' });
-        }
-      }
-      this.preloadTimeout = setTimeout(() => this.preload(), 1000);
-    },
     getWordId(word) {
       return encodeURIComponent(word.front);
     },
