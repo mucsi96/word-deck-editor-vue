@@ -12,13 +12,23 @@ const sessionOption = {
   },
 };
 
-export function create() {
-  return newSession(`http://localhost:${process.env.WEB_DRIVER_PORT}`, sessionOption);
+export async function create() {
+  try {
+    logger.info('Creating new session');
+    const session = await newSession(`http://localhost:${process.env.WEB_DRIVER_PORT}`, sessionOption);
+    logger.info('Session created');
+    return session;
+  } catch (err) {
+    logger.info('Unable to create session', err);
+    throw err;
+  }
 }
 
 export async function remove(session) {
   try {
+    logger.info('Deleting session');
     await session.delete();
+    logger.info('Session deleted');
   } catch (err) {
     logger.info('session already deleted');
   }

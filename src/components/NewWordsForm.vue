@@ -1,39 +1,171 @@
 <template>
-  <article class="ui segment">
-    <form class="ui form" @submit="submit">
-      <div class="field">
-        <label>Words</label>
-        <textarea rows="10" v-model="words"></textarea>
-      </div>
-      <button class="ui button">Add words</button>
-    </form>
-  </article>
+  <div class="ui grid">
+    <div :class="[(cropper ? 'five' : 'sixteen'), 'wide', 'column']" >
+      <article class="ui segment">
+        <form class="ui form" @submit="submit" :class="{ loading }">
+          <div class="field">
+            <label><i class="large photo icon"></i></label>
+            <textarea rows="1" @paste="pasteImage"></textarea>
+          </div>
+          <div class="ui horizontal segments">
+            <div class="ui segment" :class="{ loading: front.loading }">
+              <div class="ui block header"><i class="large crosshairs icon"></i></div>
+              <div class="field" v-if="front.language">
+                <label><i class="large flag outline icon"></i></label>
+                <select class="ui dropdown" v-model="front.language">
+                  <option v-for="language in languages" :key="language.code" :value="language.code">{{language.name}}</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>
+                  <i class="large align justify icon"></i>
+                  <button v-if="cropper" type="button" @click="ocrImage('front')" class="ui button icon"><i class="crop icon"></i></button>
+                </label>
+                <textarea :lang="front.language" spellcheck :rows="front.items.split('\n').length || 10" v-model="front.items"></textarea>
+              </div>
+            </div>
+            <div class="ui segment" :class="{ loading: back.loading }">
+              <div class="ui block header"><i class="large comment outline icon"></i></div>
+              <div class="field" v-if="back.language">
+                <label><i class="large flag outline icon"></i></label>
+                <select class="ui dropdown" v-model="back.language">
+                  <option v-for="language in languages" :key="language.code" :value="language.code">{{language.name}}</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>
+                  <i class="large align justify icon"></i>
+                  <button v-if="cropper" type="button" @click="ocrImage('back')" class="ui button icon"><i class="crop icon"></i></button>
+                </label>
+                <textarea :lang="back.language" spellcheck :rows="back.items.split('\n').length || 10" v-model="back.items"></textarea>
+              </div>
+            </div>
+          </div>
+          <router-link
+            to="/"
+            class="ui basic big icon button"
+          >
+            <i class="arrow left icon"></i>
+          </router-link>
+          <button class="ui icon big primary button" :disabled="!this.front.items"><i class="checkmark icon"></i></button>
+        </form>
+      </article>
+    </div>
+    <div class="eleven wide stretched column" :class="{ invisible: !cropper }">
+      <article class="ui segment">
+        <form class="ui form">
+          <div class="field">
+            <label>
+              <button type="button" @click="cropper.zoom(0.1)" class="ui button icon"><i class="zoom icon"></i></button>
+              <button type="button" @click="cropper.zoom(-0.1)" class="ui button icon"><i class="zoom out icon"></i></button>
+            </label>
+            <img id="pastedImage" class="fluid image">
+          </div>
+        </form>
+      </article>
+    </div>
+  </div>
 </template>
 
 <script>
+/* global Tesseract */
+import Cropper from 'cropperjs';
+import 'cropperjs/dist/cropper.min.css';
+
 export default {
   name: 'NewWordForm',
   data() {
     return {
-      words: ['word 1 front', 'word 1 back', 'word 2 front', 'word 2 back'].join('\n'),
+      mode: localStorage.getItem('newWordMode') || 'text',
+      loading: false,
+      languages: [],
+      front: {
+        language: localStorage.getItem('frontLanguage') || 'de',
+        items: '',
+        loading: false,
+      },
+      back: {
+        language: localStorage.getItem('backLanguage') || 'en',
+        items: '',
+        loading: false,
+      },
+      cropper: null,
     };
   },
+  created() {
+    this.fetchData();
+  },
+  watch: {
+    $route: 'fetchData',
+  },
   methods: {
+    setMode(mode) {
+      this.mode = mode;
+      localStorage.setItem('newWordMode', mode);
+    },
+    pasteImage(event) {
+      const blob = Array.from(event.clipboardData.items).find(({ type }) => type.startsWith('image'));
+      if (!blob) return;
+      const reader = new FileReader();
+      reader.onload = ({ target: { result } }) => {
+        const image = document.getElementById('pastedImage');
+        image.src = result;
+        this.cropper = new Cropper(image, {
+          autoCrop: false,
+          zoomOnWheel: false,
+        });
+      };
+      reader.readAsDataURL(blob.getAsFile());
+    },
+    ocrImage(side) {
+      const section = side === 'front' ? this.front : this.back;
+      section.loading = true;
+      const croppedCanvas = this.cropper.getCroppedCanvas();
+      this.cropper.clear();
+      Tesseract.recognize(croppedCanvas, {
+        lang: this.languages.find(lang => lang.code === section.language).code3,
+      })
+        .then(({ text }) => {
+          section.loading = false;
+          this.saveText(side, text);
+        });
+    },
+    saveText(side, text) {
+      const section = side === 'front' ? this.front : this.back;
+      section.items = text
+        .trim()
+        .split('\n')
+        .map(line => line.split(',')[0])
+        .map(line => line.replace(/^[-.]/, ''))
+        .map(line => (section.language === 'de' ? line.replace(/der |die |das /, '') : line))
+        .map(line => line.trim())
+        .filter(line => line)
+        .join('\n');
+    },
     submit(event) {
       event.preventDefault();
-      const words = this.words.toString().split('\n').reduce((result, word) => {
-        if (!word) return result;
-
-        const restWords = result.slice(0, -1);
-        const lastWord = result[result.length - 1];
-
-        if (lastWord && !lastWord.back) {
-          return [...restWords, { ...lastWord, back: word }];
-        }
-
-        return [...result, { front: word }];
-      }, []);
+      const backItems = this.back.items.toString().split('\n');
+      const words = this.front.items.toString().split('\n').map((front, index) => ({
+        front,
+        back: backItems[index],
+        frontLanguage: this.front.language,
+        backLanguage: this.back.language,
+      }));
+      localStorage.setItem('frontLanguage', this.front.language);
+      localStorage.setItem('backLanguage', this.back.language);
       this.$store.commit('addNewWords', words);
+      this.front.items = '';
+      this.back.items = '';
+    },
+    async fetchData() {
+      try {
+        this.loading = true;
+        const response = await this.$http.get('languages');
+        if (!response.body) return;
+        Object.assign(this.languages, response.body);
+      } finally {
+        this.loading = false;
+      }
     },
   },
 };

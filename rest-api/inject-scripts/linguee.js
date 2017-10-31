@@ -1,3 +1,8 @@
+const getWord = () => {
+  const wordNode = document.querySelector('.exact .tag_lemma .dictLink');
+  return wordNode.textContent;
+};
+
 const getTranslation = () => {
   const translationNode = document.querySelector('.exact .tag_trans .dictLink');
   return translationNode && translationNode.textContent;
@@ -31,6 +36,7 @@ const getGender = () => {
 };
 
 return {
+  word: getWord(),
   translation: getTranslation(),
   pronunciations: getPronunciations(),
   wordClass: getWordClass(),
