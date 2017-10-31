@@ -40,6 +40,6 @@ export async function remove(session) {
 
 export async function takeScreenshot(session) {
   const screenshot = await session.takeScreenshot();
-  const file = fs.createWriteStream(path.resolve(__dirname, `../screenshot-${Date.now()}.png`));
+  const file = path.resolve(__dirname, `../screenshot-${Date.now()}.png`);
   await saveBuffer(screenshot, file);
 }

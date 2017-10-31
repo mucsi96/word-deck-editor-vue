@@ -20,10 +20,17 @@
       class="ui center aligned blue segment"
       to="/add-new-words"
     >
-        <i class="plus icon"></i>
+        <i class="plus large icon"></i>
+    </router-link>
+    <router-link
+      tag="div"
+      class="ui center aligned blue segment"
+      to="/upload"
+    >
+        <i class="cloud upload large icon"></i>
     </router-link>
     <div class="ui center aligned red segment" @click="$emit('refresh')">
-      <i class="refresh icon"></i>
+      <i class="refresh large icon"></i>
     </div>
   </article>
 </template>
