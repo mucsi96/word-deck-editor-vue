@@ -5314,9 +5314,9 @@ vuex@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/vuex/-/vuex-3.0.0.tgz#98b4b5c4954b1c1c1f5b29fa0476a23580315814"
 
-w3c-webdriver@^0.0.12:
-  version "0.0.12"
-  resolved "https://registry.yarnpkg.com/w3c-webdriver/-/w3c-webdriver-0.0.12.tgz#03e6d3a519cef02e4e76325bada11525800b9a7a"
+w3c-webdriver@^0.13.0:
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/w3c-webdriver/-/w3c-webdriver-0.13.0.tgz#02ac389f9471106d7f9fb1d163fbe36ea62b3657"
 
 wait-on@^2.0.2:
   version "2.0.2"
