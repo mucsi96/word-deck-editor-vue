@@ -72,8 +72,8 @@ const store = new Vuex.Store({
         }
       }
     },
-    async upload({ state }, { provider }) {
-      await Vue.http.post('upload', { provider, deck: state.deck });
+    async upload({ state }, { provider, ...providerProps }) {
+      await Vue.http.post('upload', { provider, deck: state.deck, ...providerProps });
     },
   },
   plugins: [createPersistedState()],

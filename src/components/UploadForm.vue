@@ -6,6 +6,14 @@
         <input type="text" v-model="memrise.courseUrl">
       </div>
       <div class="field">
+        <label>Username</label>
+        <input type="text" v-model="memrise.username">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" v-model="memrise.password">
+      </div>
+      <div class="field">
         <router-link
           to="/"
           class="ui basic big icon button"
@@ -27,13 +35,15 @@ export default {
     return {
       memrise: {
         courseUrl: '',
+        username: '',
+        password: '',
       },
     };
   },
   methods: {
     upload(event) {
       event.preventDefault();
-      this.$store.dispatch('upload', { provider: 'memrise' });
+      this.$store.dispatch('upload', { provider: 'memrise', ...this.memrise });
     },
   },
 };

@@ -33,19 +33,7 @@ const saveJSON = (data, dest) => new Promise((resolve, reject) => {
 });
 
 export const saveBuffer = (data, dest) => new Promise((resolve, reject) => {
-  const readable = new Readable();
-  const file = fs.createWriteStream(dest);
-
-  // eslint-disable-next-line no-underscore-dangle
-  readable._read = () => {};
-  readable.push(data);
-  readable.pipe(file);
-  file.on('finish', () => {
-    file.close(resolve);
-  });
-  file.on('error', (err) => {
-    reject(err);
-  });
+  fs.writeFile(dest, data, err => (err ? reject(err) : resolve()));
 });
 
 const readJSON = source => new Promise((resolve, reject) => {
@@ -76,6 +64,8 @@ export const cacheMedia = async (url, target, suggestedfileName) => {
   await downloadHTTP(url, fileName);
   return path.join(target, path.basename(fileName));
 };
+
+export const resolveMediaUrl = mediaUrl => path.resolve(__dirname, '../cache', mediaUrl.replace(/^\/media\//, './'));
 
 export const cacheJSON = async (data, target) => {
   const fileName = path.resolve(base, target);

@@ -1,4 +1,3 @@
-import fs from 'fs';
 import path from 'path';
 import { newSession } from 'w3c-webdriver';
 import logger from './logger';
@@ -9,9 +8,9 @@ const sessionOption = {
     browserName: 'chrome',
     javascriptEnabled: true,
     acceptSslCerts: true,
-    chromeOptions: {
-      args: ['incognito', 'headless', 'no-sandbox', 'disable-gpu'],
-    },
+    // chromeOptions: {
+    //   args: ['incognito', 'headless', 'no-sandbox', 'disable-gpu'],
+    // },
   },
 };
 
@@ -30,7 +29,7 @@ export async function create() {
 export async function remove(session) {
   try {
     logger.info('Deleting session');
-    await session.delete();
+    // await session.delete();
     logger.info('Session deleted');
   } catch (err) {
     logger.info('session already deleted');
