@@ -15,7 +15,12 @@ export async function get({ session, word, from, to }) {
   }
   logger.info(`${cacheName} not found in cache. Fetching...`);
   let result = null;
-  const url = `https://www.linguee.com/${getLangName(from)}-${getLangName(to)}/search?source=${getLangName(from)}&query=${encodeURIComponent(word)}`;
+  const url = [
+    'https://www.linguee.com',
+    `${getLangName(from).toLowerCase()}-${getLangName(to).toLowerCase()}`,
+    `search?source=${getLangName(from).toLowerCase()}&query=${encodeURIComponent(word).toLowerCase()}`,
+  ].join('/');
+  logger.info(url);
   await session.go(url);
   result = await session.executeScript(script);
   logger.info('linguee', result);
