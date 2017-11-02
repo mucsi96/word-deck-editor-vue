@@ -31,7 +31,7 @@ export default {
     async preload() {
       const notPreloadedWord = this.deck.find(word => !word.preloading);
       if (notPreloadedWord) {
-        this.$store.dispatch('fetchWord', { word: notPreloadedWord, preload: true });
+        await this.$store.dispatch('fetchWord', { word: notPreloadedWord, preload: true });
       }
       this.preloadTimeout = setTimeout(() => this.preload(), 1000);
     },

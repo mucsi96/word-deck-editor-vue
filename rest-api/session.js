@@ -8,17 +8,20 @@ const sessionOption = {
     browserName: 'chrome',
     javascriptEnabled: true,
     acceptSslCerts: true,
-    // chromeOptions: {
-    //   args: ['incognito', 'headless', 'no-sandbox', 'disable-gpu'],
-    // },
+    chromeOptions: {
+      args: ['incognito', 'headless', 'no-sandbox', 'disable-gpu'],
+    },
   },
 };
+
+let busy = false;
 
 export async function create() {
   try {
     logger.info('Creating new session');
     const session = await newSession(`http://localhost:${process.env.WEB_DRIVER_PORT}`, sessionOption);
     logger.info('Session created');
+    busy = true;
     return session;
   } catch (err) {
     logger.info('Unable to create session', err);
@@ -29,11 +32,16 @@ export async function create() {
 export async function remove(session) {
   try {
     logger.info('Deleting session');
-    // await session.delete();
+    await session.delete();
     logger.info('Session deleted');
   } catch (err) {
     logger.info('session already deleted');
   }
+  busy = false;
+}
+
+export function isBusy() {
+  return busy;
 }
 
 
