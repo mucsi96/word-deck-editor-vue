@@ -1,6 +1,6 @@
 <template>
   <article class="ui segment">
-    <form class="ui form" :class="{ loading: !Object.keys(meta).length }">
+    <form class="ui form" :class="{ loading: meta && !Object.keys(meta).length }">
       <div class="field" v-if="word.back">
         <div class="two fields">
           <div class="field">
@@ -13,7 +13,7 @@
           </div>
         </div>
       </div>
-      <div class="field">
+      <div class="field" v-if="meta">
         <div class="three fields">
           <div class="field" v-if="meta.wordClass">
             <label>Class</label>
@@ -29,7 +29,7 @@
           </div>
         </div>
       </div>
-      <div class="ui grid">
+      <div class="ui grid" v-if="meta">
         <div class="four wide column" v-if="meta.pronunciations">
           <div class="ui two cards">
             <PronuncicationCard

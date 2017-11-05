@@ -48,8 +48,7 @@ const store = new Vuex.Store({
       try {
         const response = await Vue.http.get(url);
         if (
-          !preload
-          && !word.pronunciations
+          !word.pronunciations
           && response.body.pronunciations
           && response.body.pronunciations.length
         ) {
@@ -62,13 +61,13 @@ const store = new Vuex.Store({
         if (preload) {
           commit('updateWord', { word: word.front, prop: 'preloading', value: 'done' });
         } else {
-          commit('updateMeta', response.body || {});
+          commit('updateMeta', response.body || null);
         }
       } catch (err) {
         if (preload) {
           commit('updateWord', { word: word.front, prop: 'preloading', value: 'failed' });
         } else {
-          commit('updateMeta', {});
+          commit('updateMeta', null);
         }
       }
     },

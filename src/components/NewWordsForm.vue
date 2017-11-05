@@ -132,7 +132,7 @@ export default {
     },
     saveText(side, text) {
       const section = side === 'front' ? this.front : this.back;
-      section.items = text
+      const newItems = text
         .trim()
         .split('\n')
         .map(line => line.split(',')[0])
@@ -140,6 +140,7 @@ export default {
         .map(line => line.trim())
         .filter(line => line)
         .join('\n');
+      section.items = [section.items, newItems].join('\n');
     },
     submit(event) {
       event.preventDefault();

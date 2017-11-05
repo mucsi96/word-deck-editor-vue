@@ -1,6 +1,6 @@
 const getWord = () => {
   const wordNode = document.querySelector('.exact .tag_lemma .dictLink');
-  return wordNode.textContent;
+  return wordNode && wordNode.textContent;
 };
 
 const getTranslation = () => {
@@ -11,7 +11,7 @@ const getTranslation = () => {
 const getPronunciations = () => {
   const soundNode = document.querySelector('.exact .tag_lemma .audio');
   const wordNode = document.querySelector('.exact .tag_lemma .dictLink');
-  if (!soundNode) return [];
+  if (!soundNode || !wordNode) return [];
   const code = soundNode.getAttribute('onclick').match(/^playSound\(this,"([a-zA-z0-9/-]+)"/)[1];
   return [{
     word: wordNode.textContent,

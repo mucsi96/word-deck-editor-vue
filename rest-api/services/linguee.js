@@ -18,7 +18,7 @@ export async function get({ session, word, from, to }) {
   const url = [
     'https://www.linguee.com',
     `${getLangName(from).toLowerCase()}-${getLangName(to).toLowerCase()}`,
-    `search?source=${getLangName(from).toLowerCase()}&query=${encodeURIComponent(word).toLowerCase()}`,
+    `search?source=${getLangName(from).toLowerCase()}&query=${encodeURIComponent(word.replace(' ', '-').toLowerCase())}`,
   ].join('/');
   logger.info(url);
   await session.go(url);
