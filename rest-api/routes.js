@@ -9,5 +9,6 @@ const wrap = fn => (...args) => fn(...args).catch(args[2]);
 router.get('/meta/:lang/:word', wrap(controllers.meta.get));
 router.get('/languages', wrap(controllers.languages.get));
 router.post('/upload', wrap(controllers.upload.post));
+router.get('/spell/:lang/:word', wrap(controllers.spell.get));
 
 export default router;
