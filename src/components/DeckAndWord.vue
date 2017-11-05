@@ -1,7 +1,7 @@
 <template>
   <div class="ui grid">
     <div class="four wide column">
-      <Deck :deck="deck" @refresh="refresh" />
+      <Deck :deck="deck" />
     </div>
     <div v-if="word" class="twelve wide stretched column">
       <Word :word="word" :meta="meta" />
@@ -29,13 +29,6 @@ export default {
     },
     meta() {
       return this.$store.getters.meta;
-    },
-  },
-  methods: {
-    refresh() {
-      this.deck.forEach((word) => {
-        this.$store.commit('updateWord', { word: word.front, prop: 'preloading', value: undefined });
-      });
     },
   },
 };

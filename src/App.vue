@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Masthead />
+    <Masthead @refresh="refresh" />
     <main>
       <router-view :key="$route.name + ($route.params.id || '')" />
     </main>
@@ -34,6 +34,11 @@ export default {
         await this.$store.dispatch('fetchWord', { word: notPreloadedWord, preload: true });
       }
       this.preloadTimeout = setTimeout(() => this.preload(), 1000);
+    },
+    refresh() {
+      this.deck.forEach((word) => {
+        this.$store.commit('updateWord', { word: word.front, prop: 'preloading', value: undefined });
+      });
     },
   },
 };
