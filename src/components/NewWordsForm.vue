@@ -24,7 +24,7 @@
                 <textarea :lang="front.language" spellcheck :rows="front.items.split('\n').length || 10" v-model="front.items"></textarea>
               </div>
               <div class="field">
-                <Spellcheck :words="front.items.split('\n')" :language="front.language" @applySuggestion="applyFrontSuggestion" />
+                <Spellcheck :words="front.items" :language="front.language" @applySuggestion="applyFrontSuggestion" />
               </div>
             </div>
             <div class="ui segment" :class="{ loading: back.loading }">
@@ -43,7 +43,7 @@
                 <textarea :lang="back.language" spellcheck :rows="back.items.split('\n').length || 10" v-model="back.items"></textarea>
               </div>
               <div class="field">
-                <Spellcheck :words="back.items.split('\n')" :language="back.language" @applySuggestion="applyBackSuggestion" />
+                <Spellcheck :words="back.items" :language="back.language" @applySuggestion="applyBackSuggestion" />
               </div>
             </div>
           </div>

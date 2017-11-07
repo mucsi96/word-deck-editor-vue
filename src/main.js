@@ -3,12 +3,14 @@
 import 'regenerator-runtime/runtime';
 import Vue from 'vue';
 import VueResource from 'vue-resource';
+import AsyncComputed from 'vue-async-computed';
 import App from './App';
 import router from './router';
 import store from './store';
 
 Vue.config.productionTip = false;
 Vue.use(VueResource);
+Vue.use(AsyncComputed);
 Vue.http.options.root = '/api';
 
 /* eslint-disable no-new */

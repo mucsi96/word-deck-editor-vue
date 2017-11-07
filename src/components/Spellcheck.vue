@@ -1,7 +1,7 @@
 <template>
   <div class="ui form" :class="{ loading }">
-    <div class="ui relaxed divided list" v-if="suggestions.length">
-      <div class="item" v-for="(word, index) in words" :key="word" v-if="suggestions[index].length">
+    <div class="ui relaxed divided list" v-if="suggestions && suggestions.length">
+      <div class="item" v-for="(word, index) in lines" :key="word" v-if="suggestions[index] && suggestions[index].length">
         <div class="content">
           <div class="header">{{word}}</div>
           <div class="description">
@@ -28,46 +28,24 @@ export default {
   props: ['words', 'language'],
   data() {
     return {
-      suggestions: [],
       loading: false,
       timeout: null,
     };
   },
-  created() {
-    this.spellCheck();
-  },
-  watch: {
-    words: 'spellCheck',
-  },
-  methods: {
-    withLoader(func) {
-      return async () => {
-        try {
-          this.loading = true;
-          await func();
-        } finally {
-          this.loading = false;
-        }
-      };
+  computed: {
+    lines() {
+      return this.words.split('\n');
     },
-    withDebounce(func, wait) {
-      return () => {
-        const later = () => {
-          this.timeout = null;
-          func();
-        };
-        clearTimeout(this.timeout);
-        this.timeout = setTimeout(later, wait);
-      };
-    },
-    spellCheck() {
-      this.withDebounce(this.withLoader(async () => {
-        const response = await Vue.http.post(`spell/${this.language}`, {
-          words: this.words,
-        });
-        if (!response.body || !Array.isArray(response.body)) return;
-        this.suggestions = response.body;
-      }), 300)();
+  },
+  asyncComputed: {
+    async suggestions() {
+      this.loading = true;
+      const response = await Vue.http.post(`spell/${this.language}`, {
+        words: this.lines,
+      });
+      this.loading = false;
+      if (!response.body || !Array.isArray(response.body)) return [];
+      return response.body;
     },
   },
 };
