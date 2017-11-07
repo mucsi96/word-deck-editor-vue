@@ -6,7 +6,7 @@ import { promisify } from 'util';
 
 const readFileAsync = promisify(fs.readFile);
 
-export async function check({ word, lang }) {
+export async function checkWords({ words, lang }) {
   const downloader = await createDownloader(path.resolve(__dirname, '../../cache/hunspell'));
   const region = lang === 'en' ? 'us' : lang;
   const { aff: affPath, dic: dicPath } = await downloader.installDictionary(`${lang}-${region}`);
@@ -17,10 +17,13 @@ export async function check({ word, lang }) {
   const dictFile = hunspellFactory.mountBuffer(dicBuffer, 'dictionary.dic');
   const hunspell = hunspellFactory.create(affFile, dictFile);
 
-  const result = {
-    correct: hunspell.spell(word),
-    suggests: hunspell.suggest(word),
-  };
+  const result = words.map(word => word.split(' ').reduce((acc, chunk) => {
+    if (!chunk || hunspell.spell(chunk)) return acc;
+    return [...acc, ...hunspell.suggest(chunk).map(suggestion => ({
+      word: chunk,
+      suggestion,
+    }))];
+  }, []));
   hunspell.dispose();
   hunspellFactory.unmount(affFile);
   hunspellFactory.unmount(dictFile);

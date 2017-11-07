@@ -2876,9 +2876,9 @@ hunspell-asm@^0.0.17:
     tslib "^1.7.1"
     unixify "^1.0.0"
 
-hunspell-dict-downloader@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/hunspell-dict-downloader/-/hunspell-dict-downloader-0.0.1.tgz#bdc3d21514676b550e5f181cf5368c558d1a144f"
+hunspell-dict-downloader@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/hunspell-dict-downloader/-/hunspell-dict-downloader-0.0.2.tgz#5c2b5a920325ccd994c09921292224e172d5c447"
   dependencies:
     fs-extra "^4.0.2"
     lodash.includes "^4.3.0"

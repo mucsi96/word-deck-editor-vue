@@ -23,6 +23,9 @@
                 </label>
                 <textarea :lang="front.language" spellcheck :rows="front.items.split('\n').length || 10" v-model="front.items"></textarea>
               </div>
+              <div class="field">
+                <Spellcheck :words="front.items.split('\n')" :language="front.language" @applySuggestion="applyFrontSuggestion" />
+              </div>
             </div>
             <div class="ui segment" :class="{ loading: back.loading }">
               <div class="ui block header"><i class="large comment outline icon"></i></div>
@@ -38,6 +41,9 @@
                   <button v-if="cropper" type="button" @click="ocrImage('back')" class="ui button icon"><i class="crop icon"></i></button>
                 </label>
                 <textarea :lang="back.language" spellcheck :rows="back.items.split('\n').length || 10" v-model="back.items"></textarea>
+              </div>
+              <div class="field">
+                <Spellcheck :words="back.items.split('\n')" :language="back.language" @applySuggestion="applyBackSuggestion" />
               </div>
             </div>
           </div>
@@ -70,6 +76,7 @@
 <script>
 /* global Tesseract */
 import Cropper from 'cropperjs';
+import Spellcheck from '@/components/Spellcheck';
 import 'cropperjs/dist/cropper.min.css';
 
 export default {
@@ -138,9 +145,13 @@ export default {
         .map(line => line.split(',')[0])
         .map(line => line.replace(/^[-.]/, ''))
         .map(line => line.trim())
-        .filter(line => line)
-        .join('\n');
-      section.items = [section.items, newItems].join('\n');
+        .filter(line => line);
+
+      if (section.items) {
+        section.items = [section.items, ...newItems].join('\n');
+      } else {
+        section.items = [...newItems].join('\n');
+      }
     },
     submit(event) {
       event.preventDefault();
@@ -167,6 +178,22 @@ export default {
         this.loading = false;
       }
     },
+    applyFrontSuggestion(data) {
+      this.applySuggestion('front', data);
+    },
+    applyBackSuggestion(data) {
+      this.applySuggestion('back', data);
+    },
+    applySuggestion(side, { word, suggestion }) {
+      const section = side === 'front' ? this.front : this.back;
+      section.items = section.items.split('\n').map((item) => {
+        if (item !== word) return item;
+        return item.replace(suggestion.word, suggestion.suggestion);
+      }).join('\n');
+    },
+  },
+  components: {
+    Spellcheck,
   },
 };
 </script>
