@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Masthead @refresh="refresh" />
+    <Masthead @refresh="refresh" @erase="erase" />
     <main>
       <router-view :key="$route.name + ($route.params.id || '')" />
     </main>
@@ -39,6 +39,9 @@ export default {
       this.deck.forEach((word) => {
         this.$store.commit('updateWord', { word: word.front, prop: 'preloading', value: undefined });
       });
+    },
+    erase() {
+      this.$store.commit('erase');
     },
   },
 };

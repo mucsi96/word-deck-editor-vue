@@ -23,6 +23,9 @@
       <div class="item" @click="$emit('refresh')">
         <i class="refresh icon"></i>
       </div>
+      <div class="item" @click="$emit('erase')">
+        <i class="erase icon"></i>
+      </div>
     </div>
   </header>
 </template>

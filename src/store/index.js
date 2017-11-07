@@ -31,6 +31,9 @@ const store = new Vuex.Store({
     updateMeta(state, meta) {
       state.meta = meta;
     },
+    erase(state) {
+      state.deck = [];
+    },
   },
   actions: {
     async fetchWord({ commit }, { word, preload }) {
