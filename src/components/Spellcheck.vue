@@ -22,6 +22,19 @@
 </template>
 <script>
 import Vue from 'vue';
+import debounce from 'debounce-promise';
+
+const getSuggestions = async ({ words, language, start, end }) => {
+  start();
+  const response = await Vue.http.post(`spell/${language}`, {
+    words,
+  });
+  end();
+  if (!response.body || !Array.isArray(response.body)) return [];
+  return response.body;
+};
+
+const debouncedGetSuggestions = debounce(getSuggestions, 300);
 
 export default {
   name: 'Spellcheck',
@@ -39,13 +52,12 @@ export default {
   },
   asyncComputed: {
     async suggestions() {
-      this.loading = true;
-      const response = await Vue.http.post(`spell/${this.language}`, {
+      return debouncedGetSuggestions({
         words: this.lines,
+        language: this.language,
+        start: () => { this.loading = true; },
+        end: () => { this.loading = false; },
       });
-      this.loading = false;
-      if (!response.body || !Array.isArray(response.body)) return [];
-      return response.body;
     },
   },
 };
