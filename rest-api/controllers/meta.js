@@ -14,13 +14,13 @@ export const get = async ({ params: { word, lang } }, res) => {
   try {
     session = await createSession();
     const lingueeMeta = await getLingueeMeta({ session, word, from: lang, to: lang === 'en' ? 'de' : 'en' });
-    if (!lingueeMeta.word) throw new Error(`Word ${word} not found on Linguee`);
+    if (!lingueeMeta.word) lingueeMeta.word = word;
     const forvoMeta = await getForvoMeta({ session, word: lingueeMeta.word, lang });
     const wiktionaryMeta = await getWiktionaryMeta({ session, word: lingueeMeta.word, lang });
-    const googleMeta = [
-      await getGoogleMeta({ session, word: lingueeMeta.translation }),
-      await getGoogleMeta({ session, word: lingueeMeta.word }),
-    ];
+    // const googleMeta = [
+    //   await getGoogleMeta({ session, word: lingueeMeta.translation }),
+    //   await getGoogleMeta({ session, word: lingueeMeta.word }),
+    // ];
     let googleSpeechMeta = { pronunciations: [] };
     if (!lingueeMeta.pronunciations.length) {
       googleSpeechMeta = await getGoogleSpeechMeta({ session, word: lingueeMeta.word, lang });
@@ -37,8 +37,8 @@ export const get = async ({ params: { word, lang } }, res) => {
       ],
       pictures: [
         ...wiktionaryMeta.pictures,
-        ...googleMeta[0].pictures,
-        ...googleMeta[1].pictures,
+        // ...googleMeta[0].pictures,
+        // ...googleMeta[1].pictures,
       ],
     };
   } catch (err) {

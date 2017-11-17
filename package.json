@@ -5,11 +5,11 @@
   "author": "Igor Mucsicska <mucsi_96@yahoo.com>",
   "private": true,
   "scripts": {
-    "dev": "node build/dev-server.js",
-    "start": "npm run dev",
+    "serve:api": "babel-watch rest-api/index.js",
+    "serve:client": "node build/dev-server.js",
+    "start": "run-p serve:api serve:client",
     "build": "node build/build.js",
-    "lint": "eslint --ext .js,.vue src",
-    "serve": "babel-watch rest-api/index.js"
+    "lint": "eslint --ext .js,.vue src"
   },
   "dependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
@@ -68,6 +68,7 @@
     "friendly-errors-webpack-plugin": "^1.6.1",
     "html-webpack-plugin": "^2.30.1",
     "http-proxy-middleware": "^0.17.3",
+    "npm-run-all": "^4.1.2",
     "opn": "^5.1.0",
     "optimize-css-assets-webpack-plugin": "^3.2.0",
     "ora": "^1.2.0",
