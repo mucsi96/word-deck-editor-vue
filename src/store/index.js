@@ -17,9 +17,17 @@ const store = new Vuex.Store({
     meta(state) {
       return state.meta;
     },
+    wordToPreload(state) {
+      return state.deck.find(word => !word.preloading);
+    },
   },
   mutations: {
     addNewWords(state, words) {
+      words.forEach((newWord) => {
+        if (state.deck.find(word => word.front === newWord.front)) {
+          throw new Error(`Word ${newWord.front} already added!`);
+        }
+      });
       state.deck = state.deck.concat(words);
     },
     updateWord(state, { word, prop, value }) {

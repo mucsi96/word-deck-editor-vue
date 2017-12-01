@@ -65,7 +65,9 @@
               <button type="button" @click="cropper.zoom(0.1)" class="ui button icon"><i class="zoom icon"></i></button>
               <button type="button" @click="cropper.zoom(-0.1)" class="ui button icon"><i class="zoom out icon"></i></button>
             </label>
-            <img id="pastedImage" class="fluid image">
+            <div>
+              <img id="pastedImage">
+            </div>
           </div>
         </form>
       </article>
@@ -120,6 +122,7 @@ export default {
         this.cropper = new Cropper(image, {
           autoCrop: false,
           zoomOnWheel: false,
+          viewMode: 3,
         });
       };
       reader.readAsDataURL(blob.getAsFile());
@@ -197,5 +200,8 @@ export default {
   },
 };
 </script>
-
-<style scoped></style>
+<style scoped>
+  #pastedImage {
+    max-width: 100%
+  }
+</style>

@@ -29,9 +29,9 @@ export default {
   },
   methods: {
     async preload() {
-      const notPreloadedWord = this.deck.find(word => !word.preloading);
-      if (notPreloadedWord) {
-        await this.$store.dispatch('fetchWord', { word: notPreloadedWord, preload: true });
+      const wordToPreload = this.$store.getters.wordToPreload;
+      if (wordToPreload) {
+        await this.$store.dispatch('fetchWord', { word: wordToPreload, preload: true });
       }
       this.preloadTimeout = setTimeout(() => this.preload(), 1000);
     },

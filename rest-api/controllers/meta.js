@@ -16,7 +16,7 @@ export const get = async ({ params: { word, lang } }, res) => {
     const lingueeMeta = await getLingueeMeta({ session, word, from: lang, to: lang === 'en' ? 'de' : 'en' });
     if (!lingueeMeta.word) lingueeMeta.word = word;
     const forvoMeta = await getForvoMeta({ session, word: lingueeMeta.word, lang });
-    const wiktionaryMeta = await getWiktionaryMeta({ session, word: lingueeMeta.word, lang });
+    // const wiktionaryMeta = await getWiktionaryMeta({ session, word: lingueeMeta.word, lang });
     // const googleMeta = [
     //   await getGoogleMeta({ session, word: lingueeMeta.translation }),
     //   await getGoogleMeta({ session, word: lingueeMeta.word }),
@@ -28,15 +28,15 @@ export const get = async ({ params: { word, lang } }, res) => {
     result = {
       wordClass: lingueeMeta.wordClass,
       gender: lingueeMeta.gender,
-      ipa: wiktionaryMeta.ipa,
+      // ipa: wiktionaryMeta.ipa,
       pronunciations: [
         ...lingueeMeta.pronunciations,
         ...googleSpeechMeta.pronunciations,
-        ...wiktionaryMeta.pronunciations,
+        // ...wiktionaryMeta.pronunciations,
         ...forvoMeta.pronunciations,
       ],
       pictures: [
-        ...wiktionaryMeta.pictures,
+        // ...wiktionaryMeta.pictures,
         // ...googleMeta[0].pictures,
         // ...googleMeta[1].pictures,
       ],
