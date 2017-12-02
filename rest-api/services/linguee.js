@@ -24,6 +24,8 @@ export async function get({ session, word, from, to }) {
   await session.go(url);
   result = await session.executeScript(script);
   logger.info('linguee', result);
+  result.pronunciations = result.pronunciations
+    .filter(pronunciation => pronunciation.word.toLowerCase() === word.toLowerCase());
   // eslint-disable-next-line no-restricted-syntax
   for (const pronunciation of result.pronunciations) {
     // eslint-disable-next-line no-await-in-loop

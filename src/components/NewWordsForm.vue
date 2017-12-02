@@ -158,7 +158,7 @@ export default {
           const singular = parts[0].trim();
           const plural = parts.length > 1 && parts[1].trim();
 
-          if (true || !plural) {
+          if (!plural) {
             return singular;
           }
 

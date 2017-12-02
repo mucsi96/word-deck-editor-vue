@@ -28,7 +28,7 @@ export async function get({ session, word, lang }) {
   // eslint-disable-next-line no-restricted-syntax
   for (const pronunciation of result.pronunciations) {
     // eslint-disable-next-line no-await-in-loop
-    const target = await cacheMedia(pronunciation.sound, path.dirname(cacheName), `${pronunciation.word}.mp3`);
+    const target = await cacheMedia(pronunciation.sound, path.dirname(cacheName), `${pronunciation.word.replace(/[.]/g, '')}.mp3`);
     pronunciation.sound = `/media/${target}`;
   }
   await cacheJSON(result, cacheName);
