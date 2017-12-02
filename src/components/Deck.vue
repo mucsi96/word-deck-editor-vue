@@ -32,6 +32,11 @@ export default {
 </script>
 
 <style scoped>
+  .segments {
+    border: none;
+    box-shadow: none;
+  }
+
   .segments > .segment {
     cursor: pointer;
   }

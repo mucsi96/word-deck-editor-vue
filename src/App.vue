@@ -48,6 +48,10 @@ export default {
 </script>
 
 <style>
+html,body {
+  height: auto;
+}
+
 main {
   margin-top: 4em;
   margin-left: 8em;

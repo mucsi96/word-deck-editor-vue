@@ -1,49 +1,53 @@
 <template>
   <div class="ui grid">
-    <div :class="[(cropper ? 'five' : 'sixteen'), 'wide', 'column']" >
-      <article class="ui segment">
+    <div id="editor" :class="[(cropper ? 'five' : 'sixteen'), 'wide', 'column']" >
+      <article class="ui basic segment">
         <form class="ui form" @submit="submit" :class="{ loading }">
           <div class="field">
             <label><i class="large photo icon"></i></label>
             <textarea rows="1" @paste="pasteImage"></textarea>
           </div>
-          <div class="ui horizontal segments">
-            <div class="ui segment" :class="{ loading: front.loading }">
-              <div class="ui block header"><i class="large crosshairs icon"></i></div>
-              <div class="field" v-if="front.language">
-                <label><i class="large flag outline icon"></i></label>
-                <select class="ui dropdown" v-model="front.language">
-                  <option v-for="language in languages" :key="language.code" :value="language.code">{{language.name}}</option>
-                </select>
-              </div>
-              <div class="field">
-                <label>
-                  <i class="large align justify icon"></i>
-                  <button v-if="cropper" type="button" @click="ocrImage('front')" class="ui button icon"><i class="crop icon"></i></button>
-                </label>
-                <textarea :lang="front.language" spellcheck :rows="front.items.split('\n').length || 10" v-model="front.items"></textarea>
-              </div>
-              <div class="field">
-                <Spellcheck :words="front.items" :language="front.language" @applySuggestion="applyFrontSuggestion" />
+          <div class="ui two column grid">
+            <div class="column">
+              <div class="ui form" :class="{ loading: front.loading }">
+                <div class="ui block header"><i class="large crosshairs icon"></i></div>
+                <div class="field" v-if="front.language">
+                  <label><i class="large flag outline icon"></i></label>
+                  <select class="ui dropdown" v-model="front.language">
+                    <option v-for="language in languages" :key="language.code" :value="language.code">{{language.name}}</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>
+                    <i class="large align justify icon"></i>
+                    <button v-if="cropper" type="button" @click="ocrImage('front')" class="ui button icon"><i class="crop icon"></i></button>
+                  </label>
+                  <textarea :lang="front.language" spellcheck :rows="front.items.split('\n').length || 10" v-model="front.items"></textarea>
+                </div>
+                <div class="field">
+                  <Spellcheck :words="front.items" :language="front.language" @applySuggestion="applyFrontSuggestion" />
+                </div>
               </div>
             </div>
-            <div class="ui segment" :class="{ loading: back.loading }">
-              <div class="ui block header"><i class="large comment outline icon"></i></div>
-              <div class="field" v-if="back.language">
-                <label><i class="large flag outline icon"></i></label>
-                <select class="ui dropdown" v-model="back.language">
-                  <option v-for="language in languages" :key="language.code" :value="language.code">{{language.name}}</option>
-                </select>
-              </div>
-              <div class="field">
-                <label>
-                  <i class="large align justify icon"></i>
-                  <button v-if="cropper" type="button" @click="ocrImage('back')" class="ui button icon"><i class="crop icon"></i></button>
-                </label>
-                <textarea :lang="back.language" spellcheck :rows="back.items.split('\n').length || 10" v-model="back.items"></textarea>
-              </div>
-              <div class="field">
-                <Spellcheck :words="back.items" :language="back.language" @applySuggestion="applyBackSuggestion" />
+            <div class="column">
+              <div class="ui form" :class="{ loading: back.loading }">
+                <div class="ui block header"><i class="large comment outline icon"></i></div>
+                <div class="field" v-if="back.language">
+                  <label><i class="large flag outline icon"></i></label>
+                  <select class="ui dropdown" v-model="back.language">
+                    <option v-for="language in languages" :key="language.code" :value="language.code">{{language.name}}</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>
+                    <i class="large align justify icon"></i>
+                    <button v-if="cropper" type="button" @click="ocrImage('back')" class="ui button icon"><i class="crop icon"></i></button>
+                  </label>
+                  <textarea :lang="back.language" spellcheck :rows="back.items.split('\n').length || 10" v-model="back.items"></textarea>
+                </div>
+                <div class="field">
+                  <Spellcheck :words="back.items" :language="back.language" @applySuggestion="applyBackSuggestion" />
+                </div>
               </div>
             </div>
           </div>
@@ -57,8 +61,8 @@
         </form>
       </article>
     </div>
-    <div class="eleven wide stretched column" :class="{ invisible: !cropper }">
-      <article class="ui segment">
+    <div id="cropper" class="eleven wide stretched column" :style="{ display: cropper ? 'block !important' : 'none !important' }">
+      <article class="ui basic segment">
         <form class="ui form">
           <div class="field">
             <label>
@@ -146,11 +150,15 @@ export default {
         .trim()
         .split('\n')
         .map((line) => {
+          if (side !== 'front') {
+            return line;
+          }
+
           const parts = line.split(',');
           const singular = parts[0].trim();
           const plural = parts.length > 1 && parts[1].trim();
 
-          if (!plural) {
+          if (true || !plural) {
             return singular;
           }
 
@@ -217,5 +225,9 @@ export default {
 <style scoped>
   #pastedImage {
     max-width: 100%
+  }
+  #editor, #cropper {
+    height: calc(100vh - 8em);
+    overflow-y: auto;
   }
 </style>

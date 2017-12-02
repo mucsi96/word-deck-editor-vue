@@ -17,7 +17,7 @@ export async function checkWords({ words, lang }) {
   const dictFile = hunspellFactory.mountBuffer(dicBuffer, 'dictionary.dic');
   const hunspell = hunspellFactory.create(affFile, dictFile);
 
-  const result = words.map(word => word.split(' ').reduce((acc, chunk) => {
+  const result = words.map(word => word.replace(/[();,?]/g, ' ').split(' ').reduce((acc, chunk) => {
     if (!chunk || hunspell.spell(chunk)) return acc;
     return [...acc, ...hunspell.suggest(chunk).map(suggestion => ({
       word: chunk,

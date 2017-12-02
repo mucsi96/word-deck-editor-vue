@@ -10,6 +10,7 @@ const getTranslation = () => {
 
 const getPronunciations = () => {
   const section = document.querySelector('.exact .tag_lemma:first-child');
+  if (!section) return [];
   const soundNode = section.querySelector('.audio');
   const wordNode = section.querySelector('.dictLink');
   if (!soundNode || !wordNode) return [];

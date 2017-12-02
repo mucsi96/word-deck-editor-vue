@@ -68,7 +68,7 @@ export const normalizeAudio = async (fileName) => {
 export const cacheMedia = async (url, target, suggestedfileName) => {
   const targetName = (suggestedfileName || path.basename(url).split('?')[0])
     .replace(/ /g, '-')
-    .replace(/[?]/g, '')
+    .replace(/[?().]/g, '')
     .toLowerCase();
   const ext = path.extname(targetName);
   const uid6 = await uid(6);

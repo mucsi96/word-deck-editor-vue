@@ -1,5 +1,5 @@
 <template>
-  <article class="ui segment">
+  <article class="ui basic segment">
     <form class="ui form" @submit="upload">
       <div class="field">
         <label>Course URL</label>
