@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { getName as getLangName } from 'iso-639-1';
-import { getJSONCache, cacheMedia, cacheJSON } from '../cache';
+import { getJSONCache, cacheMedia, cacheJSON, normalizeAudio } from '../cache';
 import logger from '../logger';
 
 const script = fs.readFileSync(path.resolve(__dirname, '../inject-scripts/linguee.js'), 'utf8');

@@ -2,9 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import http from 'http';
 import https from 'https';
+import { execSync } from 'child_process';
 import mkdirpCb from 'mkdirp';
 import uid from 'uid-safe';
 import { Readable } from 'stream';
+import logger from './logger';
 
 const base = path.resolve(__dirname, '../cache');
 
@@ -52,6 +54,17 @@ const readJSON = source => new Promise((resolve, reject) => {
   });
 });
 
+export const normalizeAudio = async (fileName) => {
+  const ext = path.extname(fileName).replace(/^\./, '');
+  const command = `ffmpeg-normalize -r ${ext} -xf ${fileName}`;
+  try {
+    logger.info(`Normalizing audio volume for ${fileName} using ffmpeg...`);
+    execSync(command);
+  } catch (err) {
+    throw new Error('You need to have ffpmeg and fmpeg-normalize installed. (pip install ffmpeg-normalize)');
+  }
+};
+
 export const cacheMedia = async (url, target, suggestedfileName) => {
   const targetName = (suggestedfileName || path.basename(url).split('?')[0])
     .replace(/ /g, '-')
@@ -62,6 +75,9 @@ export const cacheMedia = async (url, target, suggestedfileName) => {
   const fileName = path.resolve(base, target, `${path.basename(targetName, ext)}-${uid6}${ext}`);
   await mkdirp(path.dirname(fileName));
   await downloadHTTP(url, fileName);
+  if (['.mp3', '.ogg'].includes(ext)) {
+    await normalizeAudio(fileName);
+  }
   return path.join(target, path.basename(fileName));
 };
 
@@ -81,3 +97,4 @@ export const getJSONCache = async (source) => {
     return null;
   }
 };
+

@@ -145,7 +145,21 @@ export default {
       const newItems = text
         .trim()
         .split('\n')
-        .map(line => line.split(',')[0])
+        .map((line) => {
+          const parts = line.split(',');
+          const singular = parts[0].trim();
+          const plural = parts.length > 1 && parts[1].trim();
+
+          if (!plural) {
+            return singular;
+          }
+
+          if (plural.length > 2) {
+            return plural;
+          }
+
+          return `${singular}${plural}`;
+        })
         .map(line => line.replace(/^[-.]/, ''))
         .map(line => line.trim())
         .filter(line => line);
